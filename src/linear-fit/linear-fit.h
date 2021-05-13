@@ -14,5 +14,5 @@ typedef struct {
 	double test_x2;
 } linear_fit_parameters;
 
-linear_fit_parameters* data_in_parser(linear_fit_parameters* fit_data, char* path);
+int data_in_parser(linear_fit_parameters* fit_data, char* path);
 

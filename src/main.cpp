@@ -13,7 +13,8 @@ int main(int argc, char *argv[]){
   switch(argv[1][1]){
 		case LINEAR_FIT_SEL: {
 				linear_fit_parameters* fit = new linear_fit_parameters;
-				data_in_parser(fit, argv[2]);
+				if(data_in_parser(fit, argv[2]) == -1)
+					return -1;
 				//calculus
 				//output
 				delete[] fit->data_in[0];
