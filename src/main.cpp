@@ -15,7 +15,8 @@ int main(int argc, char *argv[]){
 				linear_fit_parameters* fit = new linear_fit_parameters;
 				if(data_in_parser(fit, argv[2]) == -1)
 					return -1;
-				//calculus
+				if(linear_fit_calculus(fit) == -1)
+					return -1;
 				//output
 				delete[] fit->data_in[0];
 				delete[] fit->data_in[1];

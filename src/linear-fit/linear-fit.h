@@ -1,4 +1,5 @@
 #include<fstream>
+#include <cmath>
 
 using namespace std;
 
@@ -16,3 +17,4 @@ typedef struct {
 
 int data_in_parser(linear_fit_parameters* fit_data, char* path);
 
+int linear_fit_calculus(linear_fit_parameters* fit_data);
