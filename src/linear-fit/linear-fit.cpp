@@ -1,7 +1,7 @@
 #include "linear-fit.h"
-#include <cmath>
+#include <TApplication.h>
 
-int data_in_parser(linear_fit_parameters *fit_data, char *path){
+int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 	int len;
 	fit_data->input_file_path = path;
   string tmp;
@@ -51,5 +51,37 @@ int linear_fit_calculus(linear_fit_parameters* fit_data){
 	fit_data->m = (s_xy * s_w + s_x * s_y) / delta;
 	fit_data->sigma_m = sqrt(s_xx/delta);
 	fit_data->sigma_q = sqrt(s_w/delta);
+	return 0;
+}
+
+int linear_fit_output(linear_fit_parameters *fit_data){
+ 	TApplication* app = new TApplication("Grafici",0,0); 
+
+	TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);
+ 
+  c1->SetGrid();
+ 
+	const Int_t n = 20;
+  Double_t x[n], y[n];
+  for (Int_t i=0;i<n;i++) {
+    x[i] = i*0.1;
+    y[i] = 10*sin(x[i]+0.2);
+    printf(" i %i %f %f \n",i,x[i],y[i]);
+  }
+  TGraph *gr = new TGraph(n,x,y);
+  gr->SetLineColor(2);
+  gr->SetLineWidth(4);
+  gr->SetMarkerColor(4);
+  gr->SetMarkerStyle(21);
+  gr->SetTitle("a simple graph");
+  gr->GetXaxis()->SetTitle("X title");
+  gr->GetYaxis()->SetTitle("Y title");
+  gr->Draw("ACP");
+	
+	c1->Modified();
+	c1->Update();
+  
+	app->Run();
+
 	return 0;
 }
