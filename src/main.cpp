@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
 					return -1;
 				if(linear_fit_calculus(fit) == -1)
 					return -1;
-				if(linear_fit_output(fit) == -1)
+				if(linear_fit_output(fit, argv[3], argv[4]) == -1)
 					return -1;
 				delete[] fit->data_in[0];
 				delete[] fit->data_in[1];
@@ -28,9 +28,18 @@ int main(int argc, char *argv[]){
 			break;
 		}
 		case P_O_U: {
-				//argument parser
+				propagation_data *prop_data = new propagation_data;
+				propagation_data_in_parser(prop_data);
 				//calculus
 				//output
+				for(int i = 0; i < prop_data->num_par; i++){
+					delete[] prop_data->parameters_name[i];
+					delete[] prop_data->parameters[i];
+				}
+				delete[] prop_data->parameters;
+				delete[] prop_data->parameters_name;
+				delete[] prop_data->formula;
+				delete prop_data; 
 			break;
 	  }
 		default: {

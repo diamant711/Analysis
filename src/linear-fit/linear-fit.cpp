@@ -1,5 +1,5 @@
 #include "linear-fit.h"
-#include <TApplication.h>
+#include <TPad.h>
 
 int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 	int len;
@@ -36,51 +36,52 @@ int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 
 int linear_fit_calculus(linear_fit_parameters* fit_data){
 	double s_tot[fit_data->dots], m_test, s_w = 0, s_x = 0, s_xx = 0, s_y = 0, s_xy = 0, delta;
-	m_test = (fit_data->data_in[1][fit_data->dots] - fit_data->data_in[1][0]) /
-					 (fit_data->data_in[0][fit_data->dots] - fit_data->data_in[0][0]);
+	m_test = (fit_data->data_in[1][fit_data->dots - 1] - fit_data->data_in[1][0]) /
+					 (fit_data->data_in[0][fit_data->dots - 1] - fit_data->data_in[0][0]);
 	for(int i = 0; i < fit_data->dots; i++){
 		s_tot[i] = sqrt(pow(fit_data->data_in[3][i], 2) + pow(m_test * fit_data->data_in[2][i], 2));
 		s_w += 1/pow(s_tot[i], 2);
 		s_x += (fit_data->data_in[0][i]) / pow(s_tot[i], 2);
 		s_xx += pow(fit_data->data_in[0][i], 2) / pow(s_tot[i], 2);
 		s_y += (fit_data->data_in[1][i]) / pow(s_tot[i], 2);
-		s_xy += (fit_data->data_in[1][i] * fit_data->data_in[0][i]) / pow(s_tot[i], 2);	
+		s_xy += (fit_data->data_in[1][i] * fit_data->data_in[0][i]) / pow(s_tot[i], 2);
 	}
-	delta = s_xx * s_w + s_x * s_x;
-	fit_data->q = (s_xx * s_y + s_xy * s_x) / delta;
-	fit_data->m = (s_xy * s_w + s_x * s_y) / delta;
-	fit_data->sigma_m = sqrt(s_xx/delta);
-	fit_data->sigma_q = sqrt(s_w/delta);
+	delta = (s_xx * s_w) - (s_x * s_x);
+	fit_data->q = (s_xx * s_y - s_xy * s_x) / delta;
+	fit_data->m = (s_xy * s_w - s_x * s_y) / delta;
+	fit_data->sigma_q = sqrt(s_xx/delta);
+	fit_data->sigma_m = sqrt(s_w/delta);
+	for(int i = 0; i < fit_data->dots; i++){
+		fit_data->test_x2 += pow( (fit_data->data_in[1][i] - (fit_data->data_in[0][i] * fit_data->m + fit_data->q)) / s_tot[i], 2);
+	}
+	fit_data->test_x2_r = fit_data->test_x2 / (fit_data->dots - 2);
 	return 0;
 }
 
-int linear_fit_output(linear_fit_parameters *fit_data){
+int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_title){
  	TApplication* app = new TApplication("Grafici",0,0); 
-
+	
 	TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);
- 
+
   c1->SetGrid();
  
-	const Int_t n = 20;
-  Double_t x[n], y[n];
-  for (Int_t i=0;i<n;i++) {
-    x[i] = i*0.1;
-    y[i] = 10*sin(x[i]+0.2);
-    printf(" i %i %f %f \n",i,x[i],y[i]);
-  }
-  TGraph *gr = new TGraph(n,x,y);
-  gr->SetLineColor(2);
-  gr->SetLineWidth(4);
-  gr->SetMarkerColor(4);
-  gr->SetMarkerStyle(21);
-  gr->SetTitle("a simple graph");
-  gr->GetXaxis()->SetTitle("X title");
-  gr->GetYaxis()->SetTitle("Y title");
-  gr->Draw("ACP");
+  TGraphErrors *gr_xy_err = new TGraphErrors(fit_data->dots, fit_data->data_in[0], fit_data->data_in[1],
+																														 fit_data->data_in[2], fit_data->data_in[3]);
+  gr_xy_err->SetMarkerColor(4);
+  gr_xy_err->SetMarkerStyle(20);
+  gr_xy_err->SetTitle("");
+  gr_xy_err->GetXaxis()->SetTitle(x_title);
+  gr_xy_err->GetYaxis()->SetTitle(y_title);
+	gr_xy_err->Draw("AP");
+
+	TF1 *func_fit = new TF1("linear fit", "[0]*x+[1]", gr_xy_err->GetMaximum(), gr_xy_err->GetMinimum());
 	
-	c1->Modified();
-	c1->Update();
-  
+	func_fit->SetParameter(0, fit_data->m);
+	func_fit->SetParameter(1, fit_data->q);
+  func_fit->SetLineColor(5);
+	func_fit->SetLineWidth(1);
+	func_fit->Draw("same");
+	
 	app->Run();
 
 	return 0;
