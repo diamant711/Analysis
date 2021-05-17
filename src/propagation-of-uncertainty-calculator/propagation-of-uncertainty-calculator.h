@@ -2,6 +2,9 @@
 #include "TF1.h"
 #include <cstring>
 #include <cmath>
+#include <fstream>
+
+#define FILE_LOG ".analysis-history.log"
 
 using namespace std;
 
@@ -12,6 +15,10 @@ typedef struct propagation_data{
 	char **parameters_name;
 	double result;
 } propagation_data;
+
+static void save_propagation_data(propagation_data *data);
+
+static bool restore_propagation_data(propagation_data *data);
 
 static char* replace_param(propagation_data *data, int par, char *mod_formula);
 

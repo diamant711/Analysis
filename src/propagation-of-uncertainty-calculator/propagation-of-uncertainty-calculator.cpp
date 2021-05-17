@@ -1,4 +1,74 @@
 #include "propagation-of-uncertainty-calculator.h"
+#include <cstdlib>
+
+static void save_propagation_data(propagation_data *data){
+	ofstream file_out;
+	file_out.open(FILE_LOG);
+	if(!file_out.good()){
+		cout << "Error on opening file" << endl;
+	}
+	file_out << data->formula << endl;
+	file_out << data->num_par << endl;
+	for(int i = 0; i < data->num_par; i++)
+		file_out << data->parameters[i][0] << ' ' << data->parameters[i][1] << endl;
+	for(int i = 0; i < data->num_par; i++)
+		file_out << data->parameters_name[i] << endl;
+}
+
+static bool restore_propagation_data(propagation_data *data){
+	char sel;
+	ifstream file_in;
+	file_in.open(FILE_LOG);
+	if(!file_in.good()){
+		return 0;
+	}
+	data->formula = new char[100];
+	file_in >> data->formula;
+	file_in >> data->num_par;
+	data->parameters = new double*[data->num_par];
+	for(int i = 0; i < data->num_par; i++){
+		data->parameters[i] = new double[2];
+		file_in >> data->parameters[i][0] >> data->parameters[i][1];
+	}
+	data->parameters_name = new char*[data->num_par];
+	for(int i = 0; i < data->num_par; i++){
+		data->parameters_name[i] = new char[6];
+		file_in >> data->parameters_name[i];
+	}
+	cout << "Formula = " << data->formula << endl;
+	for(int i = 0; i < data->num_par; i++)
+		cout << "[" << i << "] ~ " << data->parameters_name[i] << " = " 
+				 << data->parameters[i][0] << " +- " << data->parameters[i][1] << endl;
+	while(1){	
+		cout << "Use this? [Y/$/n] ";
+		cin >> sel;
+		switch (sel) {
+			case 'Y':
+			case '\n':
+				return 1;
+			break;
+		
+			case '$':
+				//modify data
+			break;
+
+			case 'n':
+				for(int i = 0; i < data->num_par; i++){	
+        	delete[] data->parameters_name[i];
+        	delete[] data->parameters[i];
+        }
+        delete[] data->parameters;
+        delete[] data->parameters_name;
+		  	delete[] data->formula;
+        return 0;
+			break;
+
+			default:
+				cout << "Input error, retry" << endl;
+			break;
+		}
+	}
+}
 
 static char* replace_param(propagation_data *data, int par, char *mod_formula){
 	mod_formula = new char[strlen(data->formula) - 2];
@@ -23,27 +93,30 @@ static char* replace_param(propagation_data *data, int par, char *mod_formula){
 }
 
 void propagation_data_in_parser(propagation_data *data){
-	cout << "Inserire la relazione: ";
-	data->formula = new char[100];
-	cin >> data->formula;
-	for(int i = 0; data->formula[i] != '\0'; i++){
-		if(data->formula[i] == '['){
-			if (data->formula[i + 2] == ']') {
-				data->num_par = (data->formula[i + 1] - 48 + 1);
+	if(!restore_propagation_data(data)){
+		cout << "Inserire la relazione: ";
+		data->formula = new char[100];
+		cin >> data->formula;
+		for(int i = 0; data->formula[i] != '\0'; i++){
+			if(data->formula[i] == '['){
+				if (data->formula[i + 2] == ']') {
+					data->num_par = (data->formula[i + 1] - 48 + 1);
+				}
 			}
 		}
-	}
-	data->parameters = new double*[data->num_par];
-	data->parameters_name = new char*[data->num_par];
-	for(int i = 0; i < data->num_par; i++){
-		cout << "Nome parametro [" << i << "] : ";
-		data->parameters_name[i] = new char[6];
-		cin >> data->parameters_name[i];
-		cout << data->parameters_name[i] << " = ";
-		data->parameters[i] = new double[2];
-		cin >> data->parameters[i][0];
-		cout << "Sigma " << data->parameters_name[i] << " = ";
-		cin >> data->parameters[i][1];
+		data->parameters = new double*[data->num_par];
+		data->parameters_name = new char*[data->num_par];
+		for(int i = 0; i < data->num_par; i++){
+			cout << "Nome parametro [" << i << "] : ";
+			data->parameters_name[i] = new char[6];
+			cin >> data->parameters_name[i];
+			cout << data->parameters_name[i] << " = ";
+			data->parameters[i] = new double[2];
+			cin >> data->parameters[i][0];
+			cout << "Sigma " << data->parameters_name[i] << " = ";
+			cin >> data->parameters[i][1];
+		}
+		save_propagation_data(data);
 	}
 }
 
