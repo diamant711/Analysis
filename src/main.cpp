@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
 		case P_O_U: {
 				propagation_data *prop_data = new propagation_data;
 				propagation_data_in_parser(prop_data);
-				//calculus
+				propagation_data_calculus(prop_data);
 				//output
 				for(int i = 0; i < prop_data->num_par; i++){
 					delete[] prop_data->parameters_name[i];
