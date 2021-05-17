@@ -1,20 +1,21 @@
 #include "propagation-of-uncertainty-calculator.h"
-#include <cstring>
 
-static char* replace(propagation_data *data, int par, char *mod_formula){
+static char* replace_param(propagation_data *data, int par, char *mod_formula){
 	mod_formula = new char[strlen(data->formula) - 2];
 	for(int i = 0; data->formula[i] != '\0'; i++){
 		if(data->formula[i] == '['){
-			if(data->formula[i + 2] == ']'){
-				for(int j = 0; j < i; j++)
-					mod_formula[j] = data->formula[j];
-				mod_formula[i] = 'x';
-				int k = 1;
-				for(int j = i + 3; mod_formula[j] != '\0'; j++){
-					mod_formula[j - 2] = mod_formula[j];
-					k++;
+			if(data->formula[i + 1] == (par + 48)){	
+				if(data->formula[i + 2] == ']'){
+					for(int j = 0; j < i; j++)
+						mod_formula[j] = data->formula[j];
+					mod_formula[i] = 'x';
+					int k = 1;
+					for(int j = i + 3; data->formula[j] != '\0'; j++){
+						mod_formula[j - 2] = data->formula[j];
+						k++;
+					}
+					mod_formula[i + k] = '\0';
 				}
-				mod_formula[i + k] = '\0';
 			}
 		}
 	}
@@ -47,8 +48,17 @@ void propagation_data_in_parser(propagation_data *data){
 }
 
 void propagation_data_calculus(propagation_data *data){
-	double num_diff[data->num_par];
-	char *mod_formula;
-	cout << "formula = " << data->formula << " ; mod_formula = " << *(replace(data, 0, mod_formula)) << endl;
+	TF1 *func;
+	double partial_result = 0;
+	char *mod_formula = NULL;
+	for(int i = 0; i < data->num_par; i++){
+		func = new TF1("func", replace_param(data, i, mod_formula));
+		for(int j = 0; j < data->num_par; j++)
+			if(i != j)
+				func->SetParameter(j, data->parameters[j][0]);
+		partial_result += pow(func->Derivative(data->parameters[i][0]), 2) * pow(data->parameters[i][1], 2);
+		delete func;
+	}
 	delete[] mod_formula;
+	data->result = sqrt(partial_result);
 }
