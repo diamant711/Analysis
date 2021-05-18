@@ -25,3 +25,5 @@ static char* replace_param(propagation_data *data, int par, char *mod_formula);
 void propagation_data_in_parser(propagation_data *data);
 
 void propagation_data_calculus(propagation_data *data);
+
+void propagation_data_output(propagation_data *data);

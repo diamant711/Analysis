@@ -40,16 +40,32 @@ static bool restore_propagation_data(propagation_data *data){
 		cout << "[" << i << "] ~ " << data->parameters_name[i] << " = " 
 				 << data->parameters[i][0] << " +- " << data->parameters[i][1] << endl;
 	while(1){	
-		cout << "Use this? [Y/$/n] ";
+		cout << "Usa questi dati? [s/m/n] ";
 		cin >> sel;
 		switch (sel) {
-			case 'Y':
-			case '\n':
+			case 's':
 				return 1;
 			break;
 		
-			case '$':
-				//modify data
+			case 'm':
+				int sel2;
+				cout << "Cosa vuoi modificare? Relazione (-1), parametri (0:" << data->num_par - 1 << "): ";
+				cin >> sel2;
+				if(sel2 <= -1) {
+					cout << "Nuova relazione = ";
+					cin >> data->formula;
+					save_propagation_data(data);
+					return 1;
+				} else if(sel2 >= 0) {
+					cout << data->parameters_name[sel2] << " = ";
+					cin >> data->parameters[sel2][0];
+					cout << "Sigma " << data->parameters_name[sel2] << " = ";
+					cin >> data->parameters[sel2][1];
+					save_propagation_data(data);
+					return 1;
+				} else {
+					return 0;
+				}
 			break;
 
 			case 'n':
@@ -64,7 +80,7 @@ static bool restore_propagation_data(propagation_data *data){
 			break;
 
 			default:
-				cout << "Input error, retry" << endl;
+				cout << "Selezione errata, riprova" << endl;
 			break;
 		}
 	}
@@ -134,4 +150,14 @@ void propagation_data_calculus(propagation_data *data){
 	}
 	delete[] mod_formula;
 	data->result = sqrt(partial_result);
+}
+
+void propagation_data_output(propagation_data *data){
+	char *mod_formula;
+	TF1 *func = new TF1("func", replace_param(data, 0, mod_formula));
+	for(int i = 1; i < data->num_par; i++)
+		func->SetParameter(i, data->parameters[i][0]);
+	cout << endl << "Result = " << func->Eval(data->parameters[0][0]) << " +- " << data->result << endl;
+	delete func;
+	delete[] mod_formula;
 }
