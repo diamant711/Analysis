@@ -74,13 +74,14 @@ int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_ti
   gr_xy_err->GetYaxis()->SetTitle(y_title);
 	gr_xy_err->Draw("AP");
 
-	TF1 *func_fit = new TF1("linear fit", "[0]*x+[1]", gr_xy_err->GetMaximum(), gr_xy_err->GetMinimum());
-	
+	TF1 *func_fit = new TF1("linear fit", "[0]*x+[1]");
+
+	cout << fit_data->m << '\t' << fit_data->q << endl;
 	func_fit->SetParameter(0, fit_data->m);
 	func_fit->SetParameter(1, fit_data->q);
   func_fit->SetLineColor(5);
-	func_fit->SetLineWidth(1);
-	func_fit->Draw("same");
+	func_fit->SetLineWidth(2);
+	func_fit->Draw("SAME");
 	
 	app->Run();
 
