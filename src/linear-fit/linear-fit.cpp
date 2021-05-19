@@ -1,5 +1,4 @@
 #include "linear-fit.h"
-#include <TPad.h>
 
 int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 	int len;
@@ -59,30 +58,35 @@ int linear_fit_calculus(linear_fit_parameters* fit_data){
 }
 
 int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_title){
- 	TApplication* app = new TApplication("Grafici",0,0); 
+ 	TApplication *app = new TApplication("Grafici",0,0); 
 	
-	TCanvas *c1 = new TCanvas("c1","A Simple Graph Example",200,10,700,500);
+	TCanvas *c1 = new TCanvas("c1","Linear Fit Graph",200,10,700,500);
 
   c1->SetGrid();
  
-  TGraphErrors *gr_xy_err = new TGraphErrors(fit_data->dots, fit_data->data_in[0], fit_data->data_in[1],
+	TGraphErrors *gr_xy_err = new TGraphErrors(fit_data->dots, fit_data->data_in[0], fit_data->data_in[1],
 																														 fit_data->data_in[2], fit_data->data_in[3]);
   gr_xy_err->SetMarkerColor(4);
   gr_xy_err->SetMarkerStyle(20);
-  gr_xy_err->SetTitle("");
+	char title[100];
+	sprintf(title, "m = %lf, \t q = %lf", fit_data->m, fit_data->q);
+	gr_xy_err->SetTitle(title);
   gr_xy_err->GetXaxis()->SetTitle(x_title);
   gr_xy_err->GetYaxis()->SetTitle(y_title);
 	gr_xy_err->Draw("AP");
 
-	TF1 *func_fit = new TF1("linear fit", "[0]*x+[1]");
+	TF1 *func_fit = new TF1("linear_fit", "[0]*x+[1]");
 
-	cout << fit_data->m << '\t' << fit_data->q << endl;
 	func_fit->SetParameter(0, fit_data->m);
 	func_fit->SetParameter(1, fit_data->q);
-  func_fit->SetLineColor(5);
-	func_fit->SetLineWidth(2);
+  func_fit->SetLineColor(2);
+	func_fit->SetLineWidth(1);
 	func_fit->Draw("SAME");
 	
+	gr_xy_err->Draw("P SAME");
+	
+	//c1->Update();
+
 	app->Run();
 
 	return 0;
