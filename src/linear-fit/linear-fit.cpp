@@ -69,7 +69,11 @@ int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_ti
   gr_xy_err->SetMarkerColor(4);
   gr_xy_err->SetMarkerStyle(20);
 	char title[100];
-	sprintf(title, "m = %lf, \t q = %lf", fit_data->m, fit_data->q);
+	sprintf(title, "m = %lf +- %lf // q = %lf +- %lf // ~x2 = %lf", fit_data->m, 
+																															fit_data->sigma_m, 
+																															fit_data->q, 
+																															fit_data->sigma_q, 
+																															fit_data->test_x2_r);
 	gr_xy_err->SetTitle(title);
   gr_xy_err->GetXaxis()->SetTitle(x_title);
   gr_xy_err->GetYaxis()->SetTitle(y_title);
