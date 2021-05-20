@@ -1,3 +1,5 @@
 build/
 output/
 .analysis-history.log
+analysis
+test_data.csv
