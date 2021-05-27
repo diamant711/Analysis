@@ -4,25 +4,48 @@ static void compatibility_notation(linear_fit_parameters *fit_data){
 	char **file_ram;
 	int line = 0;
 	string tmp;
-	fstream file;
-	file.open(fit_data->input_file_path);
-	if(!file.good())
+	ifstream file_in;
+	ofstream file_out;
+	file_in.open(fit_data->input_file_path);
+	if(!file_in.good())
 		return;
-	file >> tmp;
-	while(!file.eof()){
+	getline(file_in, tmp);
+	while(!file_in.eof()){
 		line++;
-		file >> tmp;
+		getline(file_in, tmp);
 	}
-  file.clear();
-  file.seekg(0, ios::beg);	
-	for(;;){
+  file_in.clear();
+  file_in.seekg(0, ios::beg);	
+	file_ram = new char*[line];
+	for(int i = 0; i < line; i++){
+		getline(file_in, tmp);
+		file_ram[i] = new char[strlen(tmp.c_str()) + 1];
+		memcpy(file_ram[i], tmp.c_str(), strlen(tmp.c_str()) + 1);
 	}
+	for(int i = 0; i < line; i++){
+		for(int j = 0; file_ram[i][j] != '\0'; j++){
+			if(file_ram[i][j] == ',')
+				file_ram[i][j] = '.';
+		}
+	}
+	file_in.close();
+	file_out.open(fit_data->input_file_path);
+	if(!file_out.good())
+		return;
+	for(int i = 0; i < line; i++){
+		file_out << file_ram[i];
+		delete[] file_ram[i];
+		file_out << endl;
+	}
+	file_out.close();
+	delete[] file_ram;
 }
 
 int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 	int len;
 	fit_data->input_file_path = path;
-  string tmp;
+  compatibility_notation(fit_data);
+	string tmp;
 	ifstream file_in;
   file_in.open(fit_data->input_file_path);
 	if(!file_in.good()){
