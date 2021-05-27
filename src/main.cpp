@@ -24,6 +24,7 @@ int main(int argc, char *argv[]){
 				delete[] fit->data_in[2];
 				delete[] fit->data_in[3];
 				delete[] fit->data_in;
+				delete[] fit->s_tot;
 				delete fit;
 			break;
 		}

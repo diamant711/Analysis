@@ -22,6 +22,7 @@ typedef struct {
 	double sigma_q;
 	double test_x2;
 	double test_x2_r;
+	double *s_tot;
 } linear_fit_parameters;
 
 static void compatibility_notation(linear_fit_parameters *fit_data);

@@ -76,16 +76,17 @@ int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 }
 
 int linear_fit_calculus(linear_fit_parameters* fit_data){
-	double s_tot[fit_data->dots], m_test, s_w = 0, s_x = 0, s_xx = 0, s_y = 0, s_xy = 0, delta;
+	double m_test, s_w = 0, s_x = 0, s_xx = 0, s_y = 0, s_xy = 0, delta;
+	fit_data->s_tot = new double[fit_data->dots];
 	m_test = (fit_data->data_in[1][fit_data->dots - 1] - fit_data->data_in[1][0]) /
 					 (fit_data->data_in[0][fit_data->dots - 1] - fit_data->data_in[0][0]);
 	for(int i = 0; i < fit_data->dots; i++){
-		s_tot[i] = sqrt(pow(fit_data->data_in[3][i], 2) + pow(m_test * fit_data->data_in[2][i], 2));
-		s_w += 1/pow(s_tot[i], 2);
-		s_x += (fit_data->data_in[0][i]) / pow(s_tot[i], 2);
-		s_xx += pow(fit_data->data_in[0][i], 2) / pow(s_tot[i], 2);
-		s_y += (fit_data->data_in[1][i]) / pow(s_tot[i], 2);
-		s_xy += (fit_data->data_in[1][i] * fit_data->data_in[0][i]) / pow(s_tot[i], 2);
+		fit_data->s_tot[i] = sqrt(pow(fit_data->data_in[3][i], 2) + pow(m_test * fit_data->data_in[2][i], 2));
+		s_w += 1/pow(fit_data->s_tot[i], 2);
+		s_x += (fit_data->data_in[0][i]) / pow(fit_data->s_tot[i], 2);
+		s_xx += pow(fit_data->data_in[0][i], 2) / pow(fit_data->s_tot[i], 2);
+		s_y += (fit_data->data_in[1][i]) / pow(fit_data->s_tot[i], 2);
+		s_xy += (fit_data->data_in[1][i] * fit_data->data_in[0][i]) / pow(fit_data->s_tot[i], 2);
 	}
 	delta = (s_xx * s_w) - (s_x * s_x);
 	fit_data->q = (s_xx * s_y - s_xy * s_x) / delta;
@@ -93,7 +94,7 @@ int linear_fit_calculus(linear_fit_parameters* fit_data){
 	fit_data->sigma_q = sqrt(s_xx/delta);
 	fit_data->sigma_m = sqrt(s_w/delta);
 	for(int i = 0; i < fit_data->dots; i++){
-		fit_data->test_x2 += pow( (fit_data->data_in[1][i] - (fit_data->data_in[0][i] * fit_data->m + fit_data->q)) / s_tot[i], 2);
+		fit_data->test_x2 += pow( (fit_data->data_in[1][i] - (fit_data->data_in[0][i] * fit_data->m + fit_data->q)) / fit_data->s_tot[i], 2);
 	}
 	fit_data->test_x2_r = fit_data->test_x2 / (fit_data->dots - 2);
 	return 0;
@@ -107,7 +108,7 @@ int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_ti
   c1->SetGrid();
  
 	TGraphErrors *gr_xy_err = new TGraphErrors(fit_data->dots, fit_data->data_in[0], fit_data->data_in[1],
-																														 fit_data->data_in[2], fit_data->data_in[3]);
+																														 NULL, fit_data->s_tot);
   gr_xy_err->SetMarkerColor(4);
   gr_xy_err->SetMarkerStyle(20);
 	char title[100];
