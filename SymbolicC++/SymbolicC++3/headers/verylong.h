@@ -49,7 +49,7 @@ class Verylong
 
    public:
       // Constructors and destructor
-      Verylong(const string&);
+      Verylong(const string& = "0");
       Verylong(int);
       Verylong(const Verylong&);
       ~Verylong();
@@ -102,6 +102,8 @@ class Verylong
       friend istream & operator >> (istream&,Verylong&);
 };
 
+#define LIBSYMBOLICCPLUSPLUS
+
 // Class Data
 
 const Verylong Verylong::zero = Verylong("0");
@@ -112,7 +114,7 @@ const Verylong Verylong::two = Verylong("2");
 
 // Constructors, Destructors and Conversion operators.
 
-Verylong::Verylong(const string &value = "0")
+Verylong::Verylong(const string &value)
 {
    string s = (value == "") ? "0" : value;
 
@@ -588,5 +590,10 @@ Verylong Verylong::mult10(int num) const
 
 template <> Verylong zero(Verylong) { return Verylong::zero; }
 template <> Verylong one(Verylong) { return Verylong::one; }
+
+#undef LIBSYMBOLICCPLUSPLUS
+
+template <> Verylong zero(Verylong);
+template <> Verylong one(Verylong);
 
 #endif

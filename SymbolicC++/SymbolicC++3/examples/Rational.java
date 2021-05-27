@@ -140,7 +140,11 @@ public String toString()
    den = this.den;		
    if(num == 0) return "0";
    if(num == den) return "1";
-   if(num < 0) { buf.append("-"); num = -num; }
+   if(num < 0) 
+   {			
+    buf.append("-");
+    num = -num;		
+   }		
    rem = num%den;
    if(num > den) 
    {			

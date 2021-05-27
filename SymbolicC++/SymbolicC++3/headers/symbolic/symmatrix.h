@@ -60,12 +60,17 @@ class SymbolicMatrix
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
+         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic&,
+                                    const list<Symbolic>&) const;
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
 
 #endif
 #endif
+
+#define LIBSYMBOLICCPLUSPLUS
 
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLICMATRIX_DEFINE
@@ -85,13 +90,13 @@ SymbolicMatrix::SymbolicMatrix(const list<list<Symbolic> > &sl)
  list<Symbolic>::const_iterator j;
  list<list<Symbolic> >::const_iterator i;
 
- for(i=sl.begin();i!=sl.end();i++)
+ for(i=sl.begin();i!=sl.end();++i)
   if(int(i->size()) > cols) cols = i->size();
 
  Matrix<Symbolic>::resize(sl.size(),cols,Symbolic(0));
- for(k=0,i=sl.begin();i!=sl.end();k++,i++)
+ for(k=0,i=sl.begin();i!=sl.end();++k,++i)
  {
-  for(l=0,j=i->begin();j!=i->end();l++,j++)
+  for(l=0,j=i->begin();j!=i->end();++l,++j)
    Matrix<Symbolic>::operator[](k)[l] = *j;
  }
 }
@@ -99,8 +104,8 @@ SymbolicMatrix::SymbolicMatrix(const list<list<Symbolic> > &sl)
 SymbolicMatrix::SymbolicMatrix(const string &s,int n,int m)
  : Matrix<Symbolic>(n,m)
 {
- for(int i=0;i<n;i++)
-  for(int j=0;j<m;j++)
+ for(int i=0;i<n;++i)
+  for(int j=0;j<m;++j)
   {
    ostringstream os;
    if(n == 1 || m == 1)
@@ -118,8 +123,8 @@ SymbolicMatrix::SymbolicMatrix(const char *s,int n,int m)
  : Matrix<Symbolic>(n,m)
 {
  int i, j;
- for(i=0;i<n;i++)
-  for(j=0;j<m;j++)
+ for(i=0;i<n;++i)
+  for(j=0;j<m;++j)
   {
    ostringstream os;
    if(n == 1 || m == 1)
@@ -141,7 +146,7 @@ void SymbolicMatrix::print(ostream &o) const
 Symbolic SymbolicMatrix::subst(const Symbolic &x,
                                const Symbolic &y,int &n) const
 {
- if(*this == x) { n++; return y; }
+ if(*this == x) { ++n; return y; }
 
  SymbolicMatrix m(rows(),cols());
  int r, c;
@@ -188,7 +193,7 @@ Symbolic SymbolicMatrix::integrate(const Symbolic &s) const
  SymbolicMatrix m(rows(),cols());
  for(int r = rows()-1;r>=0;r--)
   for(int c = cols()-1;c>=0;c--)
-   m[r][c] = Matrix<Symbolic>::operator[](r)[c].integrate(s);
+   m[r][c] = ::integrate(Matrix<Symbolic>::operator[](r)[c],s);
 
  return m;
 }
@@ -216,6 +221,48 @@ int SymbolicMatrix::commute(const Symbolic &s) const
  return s.commute(*this);
 }
 
+PatternMatches
+SymbolicMatrix::match(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l;
+ if(type() != s.type())
+ {
+  pattern_match_FALSE(l);
+  return l;
+ }
+
+ CastPtr<SymbolicMatrix> sm(s);
+ if(rows() != sm->rows() || cols() != sm->cols())
+ {
+  pattern_match_FALSE(l);
+  return l;
+ }
+
+ for(int r = rows()-1;r>=0;r--)
+  for(int c = cols()-1;c>=0;c--)
+   if(r == rows()-1 && c == cols()-1)
+    pattern_match_OR(l, Matrix<Symbolic>::operator[](r)[c].match(
+                                                  sm->operator[](r)[c],p));
+   else
+    pattern_match_AND(l, Matrix<Symbolic>::operator[](r)[c].match(
+                                                  sm->operator[](r)[c],p));
+ return l;
+}
+ 
+PatternMatches
+SymbolicMatrix::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l = s.match(*this, p);
+
+ for(int r = rows()-1;r>=0;r--)
+  for(int c = cols()-1;c>=0;c--)
+   pattern_match_OR(l, Matrix<Symbolic>::operator[](r)[c].match_parts(s, p));
+ return l;
+}
+
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

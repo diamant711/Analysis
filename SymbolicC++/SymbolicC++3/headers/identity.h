@@ -27,13 +27,29 @@
 #include <complex>
 using namespace std;
 
-template <class T> T zero(T) { return T() - T(); }
+template <class T> T zero(T) { static const T z = T() - T(); return z; }
 
 template <class T> T one(T)
 {
- cerr << "one() not implemented" << endl;
- abort();
+ static T z(zero(T()));
+ static const T o = ++z;
+ return o;
 }
+
+template <> char zero(char);
+template <> char one(char);
+template <> short zero(short);
+template <> short one(short);
+template <> int zero(int);
+template <> int one(int);
+template <> long zero(long);
+template <> long one(long);
+template <> float zero(float);
+template <> float one(float);
+template <> double zero(double);
+template <> double one(double);
+
+#define LIBSYMBOLICCPLUSPLUS
 
 template <> char zero(char) { return (char) 0; }
 template <> char one(char) { return (char) 1; }
@@ -52,6 +68,8 @@ template <> float one(float) { return (float) 1.0; }
 
 template <> double zero(double) { return (double) 0.0; }
 template <> double one(double) { return (double) 1.0; }
+
+#undef LIBSYMBOLICCPLUSPLUS
 
 template <class T>
 complex<T> zero(complex<T>) { return complex<T>(zero(T())); }

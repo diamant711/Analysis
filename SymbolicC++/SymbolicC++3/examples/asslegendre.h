@@ -65,8 +65,7 @@ void AssLegendre::redefine(int l,int m)
    P *= (1 - x*x)^(absm/Symbolic(2)); 
 }
 
-Symbolic AssLegendre::current() const
-{ return P; }
+Symbolic AssLegendre::current() const {  return P; }
 
 ostream & operator << (ostream & s,const AssLegendre &L)
 {  return s << L.P; }

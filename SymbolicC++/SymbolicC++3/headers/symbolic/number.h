@@ -59,8 +59,8 @@ class Numeric: public CloningSymbolicInterface
          virtual int isOne() const = 0;
          virtual int isNegative() const = 0;
          virtual int cmp(const Numeric &) const = 0;
-         pair<Number<void>,Number<void> >
-             match(const Numeric&,const Numeric&) const;
+         static pair<Number<void>,Number<void> >
+             match(const Numeric&,const Numeric&);
          Symbolic subst(const Symbolic&,const Symbolic&,int &n) const;
          int compare(const Symbolic&) const;
          Symbolic df(const Symbolic&) const;
@@ -68,6 +68,9 @@ class Numeric: public CloningSymbolicInterface
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
+         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic&,
+                                    const list<Symbolic>&) const;
 };
 
 template <class T>
@@ -112,10 +115,10 @@ class Number<void>: public CastPtr<Numeric>
          int isZero() const;
          int isOne() const;
          int isNegative() const;
-         pair<Number<void>,Number<void> >
-             match(const Numeric&,const Numeric&) const;
-         pair<Number<void>,Number<void> >
-             match(const Number<void>&,const Number<void>&) const;
+         static pair<Number<void>,Number<void> >
+             match(const Numeric&,const Numeric&);
+         static pair<Number<void>,Number<void> >
+             match(const Number<void>&,const Number<void>&);
 
          Number<void> operator+(const Numeric&) const;
          Number<void> operator-(const Numeric&) const;
@@ -156,8 +159,14 @@ Number<void> operator*(const Numeric&,const Number<void>&);
 Number<void> operator/(const Numeric&,const Number<void>&);
 Number<void> operator%(const Numeric&,const Number<void>&);
 
+// Template specialization for Rational<Number<void> > and identities
+template <> Rational<Number<void> >::operator double() const;
+template <> Number<void> zero(Number<void>);
+template <> Number<void> one(Number<void>);
 #endif
 #endif
+
+#define LIBSYMBOLICCPLUSPLUS
 
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_NUMBER_DEFINE
@@ -184,7 +193,8 @@ template <> Rational<Number<void> >::operator double() const
   CastPtr<const Number<Verylong> > v2 = pr.second;
   return double(Rational<Verylong>(v1->n,v2->n));
  }
- cerr << "convert to double : " << pr.first.numerictype().name() << endl;
+ cerr << "convert to double : "
+      << pr.first.numerictype().name() << endl;
  throw SymbolicError(SymbolicError::NotDouble);
  return 0.0;
 }
@@ -194,7 +204,7 @@ template <> Rational<Number<void> >::operator double() const
 ////////////////////////////////////
 
 pair<Number<void>,Number<void> >
-Numeric::match(const Numeric &n1,const Numeric &n2) const
+Numeric::match(const Numeric &n1,const Numeric &n2)
 {
  const type_info &t1 = n1.numerictype();
  const type_info &t2 = n2.numerictype();
@@ -301,14 +311,15 @@ Numeric::match(const Numeric &n1,const Numeric &n2) const
 
 Symbolic Numeric::subst(const Symbolic &x,const Symbolic &y,int &n) const
 {
- if(*this == x) { n++; return y; }
+ if(*this == x) { ++n; return y; }
  return *this;
 }
 
 int Numeric::compare(const Symbolic &s) const
 {
  if(s.type() != type()) return 0;
- pair<Number<void>,Number<void> > p = match(*this,*Number<void>(s));
+ pair<Number<void>,Number<void> >
+  p = Number<void>::match(*this,*Number<void>(s));
  return p.first->cmp(*(p.second));
 }
 
@@ -329,6 +340,19 @@ Expanded Numeric::expand() const
 
 int Numeric::commute(const Symbolic &s) const
 { return 1; }
+
+PatternMatches
+Numeric::match(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l;
+ if(*this == s) pattern_match_TRUE(l);
+ else pattern_match_FALSE(l);
+ return l;
+}
+
+PatternMatches
+Numeric::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{ return s.match(*this, p); }
 
 ////////////////////////////////////
 // Implementation of Number       //
@@ -523,40 +547,40 @@ int Number<void>::isNegative() const
 { return (*this)->isNegative(); }
 
 pair<Number<void>,Number<void> >
-Number<void>::match(const Numeric &n1,const Numeric &n2) const
-{ return (*this)->match(n1,n2); }
+Number<void>::match(const Numeric &n1,const Numeric &n2)
+{ return Numeric::match(n1,n2); }
 
 pair<Number<void>,Number<void> >
-Number<void>::match(const Number<void> &n1,const Number<void> &n2) const
-{ return (*this)->match(*n1,*n2); }
+Number<void>::match(const Number<void> &n1,const Number<void> &n2)
+{ return Numeric::match(*n1,*n2); }
 
 Number<void> Number<void>::operator+(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*this,n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
  return p.first->add(*(p.second));
 }
 
 Number<void> Number<void>::operator-(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*this,n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
  return p.first->add(*(p.second));
 }
 
 Number<void> Number<void>::operator*(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*this,n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
  return p.first->mul(*(p.second));
 }
 
 Number<void> Number<void>::operator/(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*this,n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
  return p.first->div(*(p.second));
 }
 
 Number<void> Number<void>::operator%(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*this,n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*this,n);
  return p.first->mod(*(p.second));
 }
 
@@ -574,13 +598,13 @@ Number<void> &Number<void>::operator%=(const Numeric &n)
 
 int Number<void>::operator==(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*(*this),n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*(*this),n);
  return p.first->compare(*(p.second));
 }
 
 int Number<void>::operator<(const Numeric &n) const
 {
- pair<Number<void>,Number<void> > p = match(*(*this),n);
+ pair<Number<void>,Number<void> > p = Number<void>::match(*(*this),n);
  return (p.first - p.second).isNegative();
 }
 
@@ -661,4 +685,7 @@ Number<void> operator%(const Numeric &n1,const Number<void> &n2)
 
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

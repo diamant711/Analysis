@@ -31,9 +31,11 @@ int main(void)
 {
   complex<double> z1(1.0,-2.0);
   complex<double> z2(3.0,4.0);
-  complex<double> v = z1 + z2;
-  complex<double> w = z1*z2;
+  complex<double> v;
+  complex<double> w;
+  v = z1 + z2;
   cout << "v = " << v << endl;
+  w = z1*z2;
   cout << "w = " << w << endl;
 
   complex<double> pi(3.141592653589793235360287);

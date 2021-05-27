@@ -31,8 +31,7 @@ int main(void)
    Symbolic y, z;
 
    y = -a*5*a*b*b*c+4*a-2*a*b*c*c+6-2*a*b+3*a*b*c-8*c*c*b*a+4*c*c*c*a*b-3*b*c;
-   cout << "y = " << y << endl;
-   cout << endl;
+   cout << "y = " << y << endl; cout << endl;
 
    z = a;         cout << y.coeff(z) << endl;
    z = b;         cout << y.coeff(z) << endl;
@@ -40,13 +39,10 @@ int main(void)
    z = a*a;       cout << y.coeff(z) << endl;
    z = a*b;       cout << y.coeff(z) << endl;
    z = d;         cout << y.coeff(z) << endl;
-
    cout << endl;
 
    // find coefficients of the constant term
-   z = a;
-   cout << y.coeff(z,0) << endl;
+   z = a;         cout << y.coeff(z,0) << endl;
    cout << y.coeff(1) << endl;
-
    return 0;
 }

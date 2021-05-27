@@ -30,17 +30,20 @@ int main(void)
    Quaternion<double> Q1(3,4,5,6),
                       Q2 = Q1.conjugate(),
                       Q3 = Q1.inverse();
-   double Mag  = Q1.magnitude(), Magz = (~Q1).magnitude();
+   double Mag  = Q1.magnitude(),
+          Magz = (~Q1).magnitude();
 
    cout << "Q1 = "                    << Q1 << endl;
    cout << "Q2 = Conjugate of Q1 = "  << Q2 << endl;
    cout << "Q3 = Inverse of Q1 = "    << Q3 << endl;
    cout << "Mag  = Magnitude of Q1 = " << Mag << endl;
-   cout << "Magz = Magnitude of normalized Q1 = " << Magz << endl << endl;
+   cout << "Magz = Magnitude of normalized Q1 = " << Magz << endl;
+   cout << endl;
 
    cout << "Q1 * Q2 = " << Q1 * Q2 << endl;
    cout << "Q2 * Q1 = " << Q2 * Q1 << endl;
-   cout << "Mag^2 = Square of magnitude = " << Mag * Mag << endl << endl;
+   cout << "Mag^2 = Square of magnitude = " << Mag * Mag << endl;
+   cout << endl;
 
    cout << "Q1 * Q3 = " << Q1 * Q3 << endl;
    cout << "Q3 * Q1 = " << Q3 * Q1 << endl;

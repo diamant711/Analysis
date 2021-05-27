@@ -58,12 +58,17 @@ class Sum: public CloningSymbolicInterface
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
+         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic&,
+                                    const list<Symbolic>&) const;
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
 
 #endif
 #endif
+
+#define LIBSYMBOLICCPLUSPLUS
 
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_SUM_DEFINE
@@ -99,7 +104,7 @@ void Sum::print(ostream &o) const
 {
  if(summands.empty()) o << 0;
  for(list<Symbolic>::const_iterator i=summands.begin();i!=summands.end();
-     i++)
+     ++i)
  {
   if((i->type() != typeid(Numeric)
       || !CastPtr<const Numeric>(*i)->isNegative()) &&
@@ -117,17 +122,17 @@ Symbolic Sum::subst(const Symbolic &x,const Symbolic &y,int &n) const
   list<Symbolic>::const_iterator i;
   list<Symbolic>::iterator j;
   // make a copy of *this
-  CastPtr<Sum> s1(*this,1);
+  CastPtr<Sum> s1(*this);
   CastPtr<const Sum> s2(x);
-  for(i=s2->summands.begin();i!=s2->summands.end();i++)
+  for(i=s2->summands.begin();i!=s2->summands.end();++i)
   {
-   for(j=s1->summands.begin();j!=s1->summands.end() && *i != *j;j++);
+   for(j=s1->summands.begin();j!=s1->summands.end() && *i != *j;++j);
    if(j == s1->summands.end()) break;
    s1->summands.erase(j);
   }
   if(i == s2->summands.end())
   {
-   n++;
+   ++n;
    // reset the simplified and expanded flags
    // since substitution may have changed this
    s1->simplified = s1->expanded = 0;
@@ -139,7 +144,7 @@ Symbolic Sum::subst(const Symbolic &x,const Symbolic &y,int &n) const
  // try to substitute in each summand
  Sum s;
  for(list<Symbolic>::const_iterator i=summands.begin();i!=summands.end();
-     i++)
+     ++i)
   s.summands.push_back(i->subst(x,y,n));
  return s;
 }
@@ -154,12 +159,12 @@ Simplified Sum::simplify() const
  if(summands.size() == 1) return summands.front().simplify();
 
  // absorb sum of sums: a + (a + a) + a -> a + a + a + a
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
  {
   Simplified s = i->simplify();
   if(s.type() == typeid(Sum))
   {
-   CastPtr<Sum> sum(s);
+   CastPtr<const Sum> sum(s);
    r.summands.insert(r.summands.end(),sum->summands.begin(),
                      sum->summands.end());
   }
@@ -175,14 +180,14 @@ Simplified Sum::simplify() const
   {
    if(firstm)
    {
-    m = *CastPtr<SymbolicMatrix>(*j);
+    m = *CastPtr<const SymbolicMatrix>(*j);
     firstm = 1 - firstm;
    }
    else 
-    m = m + *CastPtr<SymbolicMatrix>(*j);
-   r.summands.erase(j++);
+    m = m + *CastPtr<const SymbolicMatrix>(*j);
+   j = r.summands.erase(j);
   }
-  else j++;
+  else ++j;
  }
  if(!firstm) r.summands.push_back(m.simplify());
 
@@ -190,7 +195,7 @@ Simplified Sum::simplify() const
  for(j=r.summands.begin();j!=r.summands.end();)
  {
   // numbers will be grouped later
-  if(j->type() == typeid(Numeric)) { j++; continue; }
+  if(j->type() == typeid(Numeric)) { ++j; continue; }
 
   Number<void> n = Number<int>(1);
   Symbolic j1 = *j;
@@ -198,20 +203,19 @@ Simplified Sum::simplify() const
   // the leading coefficient of products must be ignored in grouping comparisons
   if(j1.type() == typeid(Product))
   {
-   // make a copy of j1
-   CastPtr<Product> j2(j1,1);
+   CastPtr<Product> j2(j1);
    if(!j2->factors.empty() && j2->factors.front().type() == typeid(Numeric))
    {
     n = Number<void>(j2->factors.front());
     j2->factors.pop_front();
-    j1 = *j2;
+    j1 = j2->simplify();
    }
   }
 
-  for((k=j)++;k!=r.summands.end();)
+  for(++(k=j);k!=r.summands.end();)
   {
    // numbers will be grouped later
-   if(k->type() == typeid(Numeric)) { k++; continue; }
+   if(k->type() == typeid(Numeric)) { ++k; continue; }
 
    Symbolic k1 = *k;
    Number<void> coeff = Number<int>(1);
@@ -221,7 +225,7 @@ Simplified Sum::simplify() const
    if(k1.type() == typeid(Product))
    {
     // make a copy of k1
-    CastPtr<Product> k2(k1,1);
+    CastPtr<Product> k2(*k1);
     if(!k2->factors.empty() && k2->factors.front().type() == typeid(Numeric))
     {
      coeff = Number<void>(k2->factors.front());
@@ -233,11 +237,11 @@ Simplified Sum::simplify() const
    if(j1 == k1)
    {
     n = n + coeff;
-    r.summands.erase(k++);
+    k = r.summands.erase(k);
    }
-   else k++;
+   else ++k;
   }
-  if(n.isZero()) r.summands.erase(j++);
+  if(n.isZero()) j = r.summands.erase(j);
   else *(j++) = (Symbolic(n) * j1).simplify();
  }
 
@@ -248,9 +252,9 @@ Simplified Sum::simplify() const
   if(j->type() == typeid(Numeric))
   {
    n = n + Number<void>(*j);
-   r.summands.erase(j++);
+   j = r.summands.erase(j);
   }
-  else j++;
+  else ++j;
  }
  
  if(!n.isZero()) r.summands.push_back(n->simplify());
@@ -264,15 +268,15 @@ int Sum::compare(const Symbolic &s) const
 {
  if(type() != s.type()) return 0;
  // make a copy of s
- CastPtr<Sum> p(s,1);
+ CastPtr<Sum> p(*s);
 
  list<Symbolic>::const_iterator i;
  list<Symbolic>::iterator j;
 
  if(summands.size() != p->summands.size()) return 0;
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
  {
-  for(j=p->summands.begin();j!=p->summands.end() && *i != *j;j++);
+  for(j=p->summands.begin();j!=p->summands.end() && *i != *j;++j);
   if(j == p->summands.end()) return 0;
   p->summands.erase(j);
  }
@@ -284,7 +288,7 @@ Symbolic Sum::df(const Symbolic &s) const
 {
  list<Symbolic>::const_iterator i;
  Sum r;
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
   r.summands.push_back(i->df(s));
  return r;
 }
@@ -293,8 +297,8 @@ Symbolic Sum::integrate(const Symbolic &s) const
 {
  list<Symbolic>::const_iterator i;
  Sum r;
- for(i=summands.begin();i!=summands.end();i++)
-  r.summands.push_back(i->integrate(s));
+ for(i=summands.begin();i!=summands.end();++i)
+  r.summands.push_back(::integrate(*i,s));
  return r;
 }
 
@@ -302,7 +306,7 @@ Symbolic Sum::coeff(const Symbolic &s) const
 {
  list<Symbolic>::const_iterator i;
  Sum r;
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
   r.summands.push_back(i->coeff(s));
  return r;
 }
@@ -311,7 +315,7 @@ Expanded Sum::expand() const
 {
  list<Symbolic>::const_iterator i;
  Sum r;
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
   r.summands.push_back(i->expand());
  return r;
 }
@@ -327,14 +331,14 @@ int Sum::commute(const Symbolic &s) const
  if(s.type() == typeid(Symbol))
  {
   list<Symbolic>::const_iterator i;
-  for(i=summands.begin();i!=summands.end();i++)
+  for(i=summands.begin();i!=summands.end();++i)
    if(!i->commute(s)) return 0;
   return 1;
  }
 
  // if every term in the sum commutes with s
  // then the sum commutes with s
- for(i=summands.begin();i!=summands.end();i++)
+ for(i=summands.begin();i!=summands.end();++i)
   if(!i->commute(s)) break;
  if(i == summands.end()) return 1;
 
@@ -346,6 +350,89 @@ int Sum::commute(const Symbolic &s) const
  return sum == 0;
 }
 
+PatternMatches Sum::match(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l;
+ list<Symbolic>::const_iterator i;
+ list<list<int> >::iterator j;
+ list<int>::iterator k;
+
+ if(summands.size() == 0) return l;
+ if(summands.size() == 1) return summands.front().match(s, p);
+ if(s.type() != type()) return l;
+
+ CastPtr<Sum> sum(s);
+ list<list<int> > thismatch;
+ Sum rest(*this);
+ rest.summands.pop_front();
+ thismatch.push_back(list<int>()); // start with an empty sum
+
+ for(i=sum->summands.begin();i!=sum->summands.end();++i)
+ {
+  for(j=thismatch.begin();j!=thismatch.end();++j)
+  {
+   list<int> s(*j); s.push_back(0); j->push_back(1);
+   thismatch.insert(j, s);
+  }
+ }
+
+ for(j=thismatch.begin();j!=thismatch.end();++j)
+ {
+  Sum s1, s2;
+  for(k=j->begin(), i=sum->summands.begin();
+      k!=j->end() && i!=sum->summands.end(); ++i, ++k)
+   if(*k) s1.summands.push_back(*i); else s2.summands.push_back(*i);
+  if(s1.summands.size() != 0 && s2.summands.size() != 0)
+  {
+   PatternMatches l1 = summands.front().match(s1, p);
+   PatternMatches l2 = rest.match(s2, p);
+   pattern_match_AND(l1, l2);
+   pattern_match_OR(l, l1);
+  }
+ }
+
+ return l;
+}
+
+PatternMatches
+Sum::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l = s.match(*this, p);
+ list<Symbolic>::const_iterator i;
+ list<Sum>::iterator j;
+
+ list<Sum> matchpart;
+ matchpart.push_back(Sum()); // start with an empty sum
+
+ for(i=summands.begin();i!=summands.end();++i)
+ {
+  PatternMatches lp = i->match_parts(s, p);
+  pattern_match_OR(l, lp);
+  for(j=matchpart.begin();j!=matchpart.end();++j)
+  {
+   Sum s(*j); s.summands.push_back(*i);
+   if(s.summands.size() != 0 && s.summands.size() != summands.size())
+    matchpart.insert(j, s);
+  }
+ }
+
+ // remove empty sum
+ for(j=matchpart.begin();j!=matchpart.end();++j)
+  if(j->summands.size() == 0) break;
+ if(j != matchpart.end()); matchpart.erase(j);
+
+ for(j=matchpart.begin();j!=matchpart.end();++j)
+ {
+  PatternMatches lp = s.match(*j, p);
+  pattern_match_OR(l, lp);
+ }
+
+ return l;
+}
+
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

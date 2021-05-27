@@ -21,9 +21,6 @@
 
 // constants.h
 
-#include "symbolic.h"
-#include "functions.h"
-
 #ifndef SYMBOLIC_CPLUSPLUS_CONSTANTS
 
 #ifdef  SYMBOLIC_DECLARE
@@ -32,10 +29,11 @@
 
 namespace SymbolicConstant
 {
- Symbolic i = Symbolic(Power(Symbolic(-1), Power(Symbolic(2), Symbolic(-1))));
- Symbolic i_symbol("i");
- Symbolic e       ("e");
- Symbolic pi      ("pi");
+ static const Symbolic i = Symbolic(Power(Symbolic(-1),
+                                          Power(Symbolic(2), Symbolic(-1))));
+ static const Symbolic i_symbol("i");
+ static const Symbolic e       ("e");
+ static const Symbolic pi      ("pi");
 }
 
 #endif

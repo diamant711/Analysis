@@ -38,6 +38,18 @@ class Log;
 class Power;
 class Derivative;
 class Integral;
+class Rows;
+class Columns;
+class Row;
+class Column;
+class Transpose;
+class Trace;
+class Determinant;
+class Vec;
+class Kronecker;
+class DirectSum;
+class Hadamard;
+class Gamma;
 
 #endif
 #endif
@@ -118,6 +130,7 @@ class Power: public Symbol
          Symbolic subst(const Symbolic &x,const Symbolic &y,int &n) const;
          Symbolic df(const Symbolic&) const;
          Symbolic integrate(const Symbolic&) const;
+         PatternMatches match_parts(const Symbolic &s, const list<Symbolic>&) const;
 
          Cloning *clone() const { return Cloning::clone(*this); }
 };
@@ -147,8 +160,132 @@ class Integral: public Symbol
          Cloning *clone() const { return Cloning::clone(*this); }
 };
 
+class Rows: public Symbol
+{
+ public: Rows(const Rows&);
+         Rows(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Columns: public Symbol
+{
+ public: Columns(const Columns&);
+         Columns(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Row: public Symbol
+{
+ private: int row;
+ public:  Row(const Row&);
+          Row(const Symbolic&,int);
+
+          Simplified simplify() const;
+
+          Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Column: public Symbol
+{
+ private: int column;
+ public:  Column(const Column&);
+          Column(const Symbolic&,int);
+
+          Simplified simplify() const;
+
+          Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Transpose: public Symbol
+{
+ public: Transpose(const Transpose&);
+         Transpose(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Trace: public Symbol
+{
+ public: Trace(const Trace&);
+         Trace(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Determinant: public Symbol
+{
+ public: Determinant(const Determinant&);
+         Determinant(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Vec: public Symbol
+{
+ public: Vec(const Vec&);
+         Vec(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Kronecker: public Symbol
+{
+ public: Kronecker(const Kronecker&);
+         Kronecker(const Symbolic&,const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class DirectSum: public Symbol
+{
+ public: DirectSum(const DirectSum&);
+         DirectSum(const Symbolic&,const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Hadamard: public Symbol
+{
+ public: Hadamard(const Hadamard&);
+         Hadamard(const Symbolic&,const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
+class Gamma: public Symbol
+{
+ public: Gamma(const Gamma&);
+         Gamma(const Symbolic&);
+
+         Simplified simplify() const;
+
+         Cloning *clone() const { return Cloning::clone(*this); }
+};
+
 #endif
 #endif
+
+#define LIBSYMBOLICCPLUSPLUS
 
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_FUNCTIONS_DEFINE
@@ -297,11 +434,12 @@ Symbolic Cosh::integrate(const Symbolic &s) const
 
 Log::Log(const Log &s) : Symbol(s) {}
 
-Log::Log(const Symbolic &s1,const Symbolic &s2) : Symbol(Symbol("log")[s1,s2]) {}
+Log::Log(const Symbolic &s1,const Symbolic &s2)
+: Symbol(Symbol("log")[s1,s2]) {}
 
 void Log::print(ostream &o) const
 {
- if(parameters.front() == SymbolicConstant::e)
+ if(parameters.size() == 2 && parameters.front() == SymbolicConstant::e)
  {
   Log l = *this;
   l.name = "ln";
@@ -333,7 +471,7 @@ Simplified Log::simplify() const
  return *this;
 }
 
-// d/ds log_a(b) = d/ds (ln(a) / ln(b))
+// d/ds log_a(b) = d/ds (ln(b) / ln(a))
 //               = (1/b db/ds - log_a(b) / a da/ds) / ln(a)
 //               = (a db/ds - b log_a(b) da/ds) / (a b ln(a))
 Symbolic Log::df(const Symbolic &s) const
@@ -471,6 +609,35 @@ Expanded Power::expand() const
     b.type() != typeid(Product) &&
     b.type() != typeid(Numeric))
   return Power(b,n);
+
+ // a^(b+c) == a^b a^c  when b and c commute
+ if(n.type() == typeid(Sum))
+ {
+  CastPtr<const Sum> s(*n);
+  Product p;
+  list<Symbolic>::const_iterator k, k1;
+  for(k=s->summands.begin();k!=s->summands.end();++k)
+   for(++(k1=k);k1!=s->summands.end();++k1)
+    if(!k->commute(*k1)) return Power(b,n);
+  for(k=s->summands.begin();k!=s->summands.end();++k)
+   p.factors.push_back(Power(b,*k));
+  return p;
+ }
+
+ // (a*b)^c == a^c b^c  when a and b commute
+ if(b.type() == typeid(Product))
+ {
+  CastPtr<const Product> p(*b);
+  Product r;
+  list<Symbolic>::const_iterator k, k1;
+  for(k=p->factors.begin();k!=p->factors.end();++k)
+   for(++(k1=k);k1!=p->factors.end();++k1)
+    if(!k->commute(*k1)) return Power(b,n);
+  for(k=p->factors.begin();k!=p->factors.end();++k)
+   r.factors.push_back(Power(*k,n));
+  return r;
+ }
+
  if(n.type() != typeid(Numeric) ||
     Number<void>(n).numerictype() != typeid(int))
   return Power(b,n);
@@ -509,7 +676,7 @@ Symbolic Power::subst(const Symbolic &x,const Symbolic &y,int &n) const
    int t = CastPtr<const Number<int> >(p->parameters.back())->n;
    if((s > 0) && (t > 0) && (s >= t))
    {
-    n++;
+    ++n;
     return Power(parameters.front(),s - t).subst(x,y,n) * y;
    }
   }
@@ -539,6 +706,40 @@ Symbolic Power::integrate(const Symbolic &s) const
   return *this;
  if(df(s) == 0) return *this * s;
  return Integral(*this,s);
+}
+
+PatternMatches
+Power::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l;
+ if(s.type() == typeid(Power))
+ {
+  CastPtr<const Power> pw(s);
+  l = pw->parameters.front().match(parameters.front(), p);
+  if(!l.empty()                                                   &&
+     parameters.back().type() == typeid(Numeric)                  &&
+     pw->parameters.back().type() == typeid(Numeric)              &&
+     Number<void>(parameters.back()).numerictype() == typeid(int) &&
+     Number<void>(pw->parameters.back()).numerictype() == typeid(int))
+  {
+   int s = CastPtr<const Number<int> >(parameters.back())->n;
+   int t = CastPtr<const Number<int> >(pw->parameters.back())->n;
+   if((s < 0) || (t < 0) || (s < t))
+    pattern_match_FALSE(l);
+  }
+ }
+
+ if(parameters.back().type() == typeid(Numeric) &&
+    Number<void>(parameters.back()).numerictype() == typeid(int))
+ {
+  int n = abs(CastPtr<const Number<int> >(parameters.back())->n);
+  Product pr;
+  while(n-->0) pr.factors.insert(pr.factors.end(), parameters.back());
+  pattern_match_OR(l, pr.match_parts(s, p));
+ }
+
+ pattern_match_OR(l, Symbol::match_parts(s, p));
+ return l;
 }
 
 //////////////////////////////////////
@@ -573,23 +774,23 @@ Symbolic Derivative::subst(const Symbolic &x,const Symbolic &y,int &n) const
     parameters.front() == CastPtr<const Derivative>(x)->parameters.front())
  {
   // make a copy of this
-  CastPtr<Derivative> l(*this,1);
+  CastPtr<Derivative> l(*this);
   CastPtr<const Derivative> d(x);
   i = d->parameters.begin();
-  for(i++;i!=d->parameters.end();i++)
+  for(++i;i!=d->parameters.end();++i)
   {
    j = l->parameters.begin();
-   for(j++;j!=l->parameters.end();j++)
+   for(++j;j!=l->parameters.end();++j)
     if(*j == *i) break;
    if(j == l->parameters.end()) break;
    l->parameters.erase(j);
   }
   if(i == d->parameters.end())
   {
-   n++;
+   ++n;
    Symbolic newdf = y;
    j = l->parameters.begin();
-   for(j++;j!=l->parameters.end();j++)
+   for(++j;j!=l->parameters.end();++j)
     newdf = ::df(newdf,*j);
    return newdf;
   }
@@ -597,8 +798,18 @@ Symbolic Derivative::subst(const Symbolic &x,const Symbolic &y,int &n) const
 
  i = parameters.begin();
  Symbolic dy = i->subst(x,y,n);
- for(i++;i!=parameters.end();i++)
+
+ if(dy == *i)
+ {
+  Derivative d(*this);
+  for(j=d.parameters.begin(),++j;j!=d.parameters.end();++j)
+   *j = j->subst(x,y,n);
+  return d;
+ }
+
+ for(++i;i!=parameters.end();++i)
   dy = dy.df(i->subst(x,y,n));
+
  return dy;
 }
 
@@ -610,7 +821,7 @@ Symbolic Derivative::df(const Symbolic &s) const
  {
   Symbolic result;
   CastPtr<const Symbol> sym(parameters.front());
-  for(i=sym->parameters.begin();i!=sym->parameters.end();i++)
+  for(i=sym->parameters.begin();i!=sym->parameters.end();++i)
    result = result + Derivative(*this,*i) * i->df(s);
 
   return result;
@@ -633,12 +844,12 @@ int Derivative::compare(const Symbolic &s) const
 
  if(s.type() != type()) return 0;
  // make a copy of s
- CastPtr<Derivative> d(s,1);
+ CastPtr<Derivative> d(*s);
  if(d->parameters.size() != parameters.size()) return 0;
  if(d->parameters.front() != parameters.front()) return 0;
- for(i=parameters.begin(),i++;i!=parameters.end();i++)
+ for(i=parameters.begin(),++i;i!=parameters.end();++i)
  {
-  for(j=d->parameters.begin(),j++;j!=d->parameters.end();j++)
+  for(j=d->parameters.begin(),++j;j!=d->parameters.end();++j)
    if(*i == *j) break;
   if(j == d->parameters.end()) return 0;
   d->parameters.erase(j);
@@ -652,14 +863,14 @@ Symbolic Derivative::integrate(const Symbolic &s) const
  list<Symbolic>::const_iterator i, i1 = parameters.end();
  list<Symbolic>::iterator j;
 
- for(i=parameters.begin();i!=parameters.end();i++,n++)
+ for(i=parameters.begin();i!=parameters.end();++i,++n)
   if(*i == s) { i1 = i; n1 = n; }
 
  if(i1 != parameters.end())
  {
   // make a copy of *this
-  CastPtr<Derivative> d(*this,1);
-  for(j=d->parameters.begin();n1!=0;j++,n1--);
+  CastPtr<Derivative> d(*this);
+  for(j=d->parameters.begin();n1!=0;++j,--n1);
   d->parameters.erase(j);
   if(d->parameters.size() == 1) return d->parameters.front();
   return *d;
@@ -689,15 +900,14 @@ Integral::Integral(const Symbolic &s1,const Symbolic &s2) : Symbol("int")
  }
 }
 
-Symbolic Integral::subst(const Symbolic &x,
-                         const Symbolic &y,int &n) const
+Symbolic Integral::subst(const Symbolic &x,const Symbolic &y,int &n) const
 {
- if(*this == x) { n++; return y; }
+ if(*this == x) { ++n; return y; }
 
  list<Symbolic>::const_iterator i = parameters.begin();
  Symbolic dy = i->subst(x,y,n);
- for(i++;i!=parameters.end();i++)
-  dy = dy.integrate(i->subst(x,y,n));
+ for(++i;i!=parameters.end();++i)
+  dy = ::integrate(dy, i->subst(x,y,n));
  return dy;
 }
 
@@ -707,14 +917,14 @@ Symbolic Integral::df(const Symbolic &s) const
  list<Symbolic>::const_iterator i, i1 = parameters.end();
  list<Symbolic>::iterator j;
 
- for(i=parameters.begin();i!=parameters.end();i++,n++)
+ for(i=parameters.begin();i!=parameters.end();++i,++n)
   if(*i == s) { i1 = i; n1 = n; }
 
  if(i1 != parameters.end())
  {
   // make a copy of *this
-  CastPtr<Integral> in(*this,1);
-  for(j=in->parameters.begin();n1!=0;j++,n1--);
+  CastPtr<Integral> in(*this);
+  for(j=in->parameters.begin();n1!=0;++j,--n1);
   in->parameters.erase(j);
   if(in->parameters.size() == 1) return in->parameters.front();
   return *in;
@@ -736,6 +946,213 @@ Symbolic Integral::integrate(const Symbolic &s) const
  return *this * s;
 }
 
+//////////////////////////////////////
+// Implementation of Rows           //
+//////////////////////////////////////
+
+Rows::Rows(const Rows &s) : Symbol(s) {}
+
+Rows::Rows(const Symbolic &s) : Symbol(Symbol("rows")[s]) {}
+
+Simplified Rows::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Rows(s);
+ return Symbolic(CastPtr<const SymbolicMatrix>(s)->rows());
+}
+
+//////////////////////////////////////
+// Implementation of Columns        //
+//////////////////////////////////////
+
+Columns::Columns(const Columns &s) : Symbol(s) {}
+
+Columns::Columns(const Symbolic &s) : Symbol(Symbol("columns")[s]) {}
+
+Simplified Columns::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Columns(s);
+ return Symbolic(CastPtr<const SymbolicMatrix>(s)->cols());
+}
+
+//////////////////////////////////////
+// Implementation of Row            //
+//////////////////////////////////////
+
+Row::Row(const Row &s) : Symbol(s), row(s.row) {}
+
+Row::Row(const Symbolic &s,int r) : Symbol(Symbol("row")[s,r]), row(r) {}
+
+Simplified Row::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Row(s, row);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s)->operator[](row));
+}
+
+//////////////////////////////////////
+// Implementation of Column         //
+//////////////////////////////////////
+
+Column::Column(const Column &s) : Symbol(s), column(s.column) {}
+
+Column::Column(const Symbolic &s,int c)
+ : Symbol(Symbol("column")[s,c]), column(c) {}
+
+Simplified Column::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Column(s, column);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s)->operator()(column));
+}
+
+//////////////////////////////////////
+// Implementation of Transpose      //
+//////////////////////////////////////
+
+Transpose::Transpose(const Transpose &s) : Symbol(s) {}
+
+Transpose::Transpose(const Symbolic &s) : Symbol(Symbol("transpose")[s]) {}
+
+Simplified Transpose::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Transpose(s);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s)->transpose());
+}
+
+//////////////////////////////////////
+// Implementation of Trace          //
+//////////////////////////////////////
+
+Trace::Trace(const Trace &s) : Symbol(s) {}
+
+Trace::Trace(const Symbolic &s) : Symbol(Symbol("tr")[s]) {}
+
+Simplified Trace::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Trace(s);
+ return CastPtr<const SymbolicMatrix>(s)->trace();
+}
+
+//////////////////////////////////////
+// Implementation of Determinant    //
+//////////////////////////////////////
+
+Determinant::Determinant(const Determinant &s) : Symbol(s) {}
+
+Determinant::Determinant(const Symbolic &s) : Symbol(Symbol("det")[s]) {}
+
+Simplified Determinant::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Determinant(s);
+ return CastPtr<const SymbolicMatrix>(s)->determinant();
+}
+
+//////////////////////////////////////
+// Implementation of Vec            //
+//////////////////////////////////////
+
+Vec::Vec(const Vec &s) : Symbol(s) {}
+
+Vec::Vec(const Symbolic &s) : Symbol(Symbol("vec")[s]) {}
+
+Simplified Vec::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(SymbolicMatrix)) return Vec(s);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s)->vec());
+}
+
+//////////////////////////////////////
+// Implementation of Kronecker      //
+//////////////////////////////////////
+
+Kronecker::Kronecker(const Kronecker &s) : Symbol(s) {}
+
+Kronecker::Kronecker(const Symbolic &s1, const Symbolic &s2)
+ : Symbol(Symbol("kron")[s1,s2]) {}
+
+Simplified Kronecker::simplify() const
+{
+ const Symbolic &s1 = parameters.front().simplify();
+ const Symbolic &s2 = parameters.back().simplify();
+ if(s1.type() != typeid(SymbolicMatrix)) return Kronecker(s1,s2);
+ if(s2.type() != typeid(SymbolicMatrix)) return Kronecker(s1,s2);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s1)
+                       ->kron(*CastPtr<const SymbolicMatrix>(s2)));
+}
+
+//////////////////////////////////////
+// Implementation of DirectSum      //
+//////////////////////////////////////
+
+DirectSum::DirectSum(const DirectSum &s) : Symbol(s) {}
+
+DirectSum::DirectSum(const Symbolic &s1, const Symbolic &s2)
+ : Symbol(Symbol("dsum")[s1,s2]) {}
+
+Simplified DirectSum::simplify() const
+{
+ const Symbolic &s1 = parameters.front().simplify();
+ const Symbolic &s2 = parameters.back().simplify();
+ if(s1.type() != typeid(SymbolicMatrix)) return DirectSum(s1,s2);
+ if(s2.type() != typeid(SymbolicMatrix)) return DirectSum(s1,s2);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s1)
+                       ->dsum(*CastPtr<const SymbolicMatrix>(s2)));
+}
+
+//////////////////////////////////////
+// Implementation of Hadamard       //
+//////////////////////////////////////
+
+Hadamard::Hadamard(const Hadamard &s) : Symbol(s) {}
+
+Hadamard::Hadamard(const Symbolic &s1, const Symbolic &s2)
+ : Symbol(Symbol("hadamard")[s1,s2]) {}
+
+Simplified Hadamard::simplify() const
+{
+ const Symbolic &s1 = parameters.front().simplify();
+ const Symbolic &s2 = parameters.back().simplify();
+ if(s1.type() != typeid(SymbolicMatrix)) return Hadamard(s1,s2);
+ if(s2.type() != typeid(SymbolicMatrix)) return Hadamard(s1,s2);
+ return SymbolicMatrix(CastPtr<const SymbolicMatrix>(s1)
+                        ->hadamard(*CastPtr<const SymbolicMatrix>(s2)));
+}
+
+//////////////////////////////////////
+// Implementation of Gamma          //
+//////////////////////////////////////
+
+Gamma::Gamma(const Gamma &s) : Symbol(s) {}
+
+Gamma::Gamma(const Symbolic &s) : Symbol(Symbol("gamma")[s]) {}
+
+Simplified Gamma::simplify() const
+{
+ const Symbolic &s = parameters.front().simplify();
+ if(s.type() != typeid(Numeric)) return Gamma(s);
+ CastPtr<Numeric> n(s);
+ if(n->numerictype() == typeid(int))
+ {
+  int i = int(s) - 1;
+  if(i >= 0)
+  {
+   Symbolic f = 1;
+   while(i > 0) f *= i--;
+   return f;
+  }
+ }
+ return Gamma(s);
+}
+
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

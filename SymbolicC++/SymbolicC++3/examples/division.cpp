@@ -28,11 +28,14 @@ using namespace std;
 int main(void)
 {
   Verylong P("999"), Q("111"), D("105");
+
   P = pow(P,D);     // 999^105 = 9.00277e+314 (exceeded double limit)
   Q = pow(Q,D);     // 111^105 = 5.74001e+214
+
   cout << div(P,Q) << endl;             // 1.56842e+100 - OK
   cout << div(Q,P) << endl;             // 6.37583e-101 - OK
   cout << double(P)/double(Q) << endl;  // NaN
   cout << double(Q)/double(P) << endl;  // NaN
+
   return 0;
 }

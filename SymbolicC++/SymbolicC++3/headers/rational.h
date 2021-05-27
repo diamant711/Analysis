@@ -28,6 +28,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <limits>
 #include <vector>
 #include <ctype.h>
 #include "identity.h"
@@ -393,13 +394,18 @@ template <class T> T abs(const T &x)
 }
 
 #include "verylong.h"
-template <>
-Rational<Verylong>::operator double() const
-{ return div(p,q); }
+template <> Rational<Verylong>::operator double() const;
+
+#define LIBSYMBOLICCPLUSPLUS
+
+template <> Rational<Verylong>::operator double() const { return div(p,q); }
+
+#undef LIBSYMBOLICCPLUSPLUS
 
 template <class T>
 Rational<T> zero(Rational<T>) { return Rational<T>(zero(T())); }
 
 template <class T>
 Rational<T> one(Rational<T>) { return Rational<T>(one(T())); }
+
 #endif

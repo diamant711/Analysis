@@ -34,6 +34,8 @@
 #include "identity.h"
 using namespace std;
 
+// Assumption : T has typecasts defined and can act as a numeric data type
+
 // Multinomial class
 
 template <class T>

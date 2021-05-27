@@ -34,10 +34,7 @@ int main(void)
    cout << "y = " << y << endl;
 
    for(i=0;i<8;i++)
-   {
-    y = df(y,x);
-    cout << "y = " << y << endl;
-   }
+   { y = df(y,x); cout << "y = " << y << endl; }
    cout << endl;
 
    Symbolic u, v("v");
@@ -46,9 +43,6 @@ int main(void)
    cout << "u = " << u << endl;
 
    for(i=0;i<8;i++)
-   {
-    u = df(u,v);
-    cout << "u = " << u << endl;
-   }
+   { u = df(u,v); cout << "u = " << u << endl; }
    return 0;
 }

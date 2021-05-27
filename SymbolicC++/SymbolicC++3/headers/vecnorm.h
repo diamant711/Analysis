@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <math.h>
+#include "vector.h"
 using namespace std;
 
 template <class T> T norm1(const Vector<T> &v)
@@ -36,12 +37,16 @@ template <class T> T norm1(const Vector<T> &v)
    return result;
 }
 
+double norm1(const Vector<double> &v);
+
+#define LIBSYMBOLICCPLUSPLUS
 double norm1(const Vector<double> &v)
 {
    double result(0);
    for(int i=0;i<int(v.size());i++) result = result + fabs(v[i]);
    return result;
 }
+#undef LIBSYMBOLICCPLUSPLUS
 
 template <class T> double norm2(const Vector<T> &v)
 {
@@ -61,6 +66,9 @@ template <class T> T normI(const Vector<T> &v)
    return maxItem;
 }
 
+double normI(const Vector<double> &v);
+
+#define LIBSYMBOLICCPLUSPLUS
 double normI(const Vector<double> &v)
 {
    double maxItem(fabs(v[0])), temp;
@@ -71,6 +79,7 @@ double normI(const Vector<double> &v)
    }
    return maxItem;
 }
+#undef LIBSYMBOLICCPLUSPLUS
 
 template <class T> Vector<T> normalize(const Vector<T> &v)
 {

@@ -33,14 +33,16 @@ int main(void)
  double x = 3.14159, k, k2, eps = 0.01, res1, res2, res3;
 
  //sin,cos,1 of x
- k = 0.0; k2 = k*k;
+ k = 0.0;
+ k2 = k*k;
  scdn(x,k2,eps,res1,res2,res3);
  cout << "sin(x) = " << res1 << endl;
  cout << "cos(x) = " << res2 << endl;
  cout << "1(x) = " << res3 << endl;
 
  //tanh,sech,sech of x
- k = 1.0; k2 = k*k;
+ k = 1.0;
+ k2 = k*k;
  scdn(x,k2,eps,res1,res2,res3);
  cout << "tanh(x) = " << res1 << endl;
  cout << "sech(x) = " << res2 << endl;

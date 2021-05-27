@@ -64,6 +64,12 @@ class SymbolicInterface
          virtual Symbolic coeff(const Symbolic&) const = 0;
          virtual Expanded expand() const = 0;
          virtual int commute(const Symbolic&) const = 0;
+         // match *this (as a pattern) against an expression
+         virtual PatternMatches match(const Symbolic&,
+                                      const list<Symbolic>&) const = 0;
+         // match parts of *this (as an expression) against a pattern
+         virtual PatternMatches match_parts(const Symbolic&,
+                                            const list<Symbolic>&) const = 0;
 };
 
 class CloningSymbolicInterface : public SymbolicInterface, public Cloning
@@ -78,6 +84,7 @@ class SymbolicProxy: public SymbolicInterface,
  public: SymbolicProxy(const CloningSymbolicInterface&);
          SymbolicProxy(const SymbolicProxy&);
          SymbolicProxy(const Number<void>&);
+         SymbolicProxy();
 
          void print(ostream&) const;
          const type_info &type() const;
@@ -89,6 +96,9 @@ class SymbolicProxy: public SymbolicInterface,
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
+         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic&,
+                                      const list<Symbolic>&) const;
 
          SymbolicProxy &operator=(const CloningSymbolicInterface&);
          SymbolicProxy &operator=(const SymbolicProxy&);
@@ -141,7 +151,7 @@ class Symbolic: public SymbolicProxy
          SymbolicProxy &operator=(const list<Symbolic>&);
          SymbolicProxy &operator=(const list<list<Symbolic> >&);
          Symbolic operator[](const Equation&) const;
-         Symbolic operator[](const list<Equation>&) const;
+         Symbolic operator[](const Equations&) const;
          Symbolic operator[](const Symbolic&) const;
          Symbolic operator[](const list<Symbolic>&) const;
          Symbolic &operator()(int);
@@ -155,11 +165,11 @@ class Symbolic: public SymbolicProxy
          Symbolic subst(const Symbolic&,
                         const double&,int &n=subst_count) const;
          Symbolic subst(const Equation&,int &n=subst_count) const;
-         Symbolic subst(const list<Equation>&,int &n=subst_count) const;
+         Symbolic subst(const Equations&,int &n=subst_count) const;
          Symbolic subst_all(const Symbolic&,
                             const Symbolic&,int &n=subst_count) const;
          Symbolic subst_all(const Equation&,int &n=subst_count) const;
-         Symbolic subst_all(const list<Equation>&,int &n=subst_count) const;
+         Symbolic subst_all(const Equations&,int &n=subst_count) const;
          Symbolic coeff(const Symbolic&) const;
          Symbolic coeff(const Symbolic&,int) const;
          Symbolic coeff(const int&) const;
@@ -191,6 +201,8 @@ class Symbolic: public SymbolicProxy
 #endif
 #endif
 
+#define LIBSYMBOLICCPLUSPLUS
+
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_SYMBOLIC_DEFINE
 #define SYMBOLIC_CPLUSPLUS_SYMBOLIC_DEFINE
@@ -210,6 +222,7 @@ SymbolicInterface::~SymbolicInterface() {}
 
 const type_info &SymbolicInterface::type() const
 { return typeid(*this); }
+
 
 ///////////////////////////////////////////////////
 // Implementation for CloningSymbolicInterface   //
@@ -234,6 +247,8 @@ SymbolicProxy::SymbolicProxy(const SymbolicProxy &s)
 
 SymbolicProxy::SymbolicProxy(const Number<void> &n)
  : CastPtr<CloningSymbolicInterface>(n) {}
+
+SymbolicProxy::SymbolicProxy() {}
 
 void SymbolicProxy::print(ostream &o) const
 { (*this)->print(o); }
@@ -271,6 +286,14 @@ Expanded SymbolicProxy::expand() const
 
 int SymbolicProxy::commute(const Symbolic &s) const
 { return (*this)->commute(s); }
+
+PatternMatches
+SymbolicProxy::match(const Symbolic &s, const list<Symbolic> &p) const
+{ return (*this)->match(s,p); }
+
+PatternMatches
+SymbolicProxy::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{ return (*this)->match_parts(s,p); }
 
 SymbolicProxy &SymbolicProxy::operator=(const CloningSymbolicInterface &s)
 {
@@ -331,19 +354,13 @@ Symbolic::Symbolic(const Symbolic &s) : SymbolicProxy(s)
   // s is presumed const, so indexing via operator()
   // should access a copy
  {
-  CastPtr<SymbolicMatrix> csm(*s,1);
+  CastPtr<const SymbolicMatrix> csm(s);
   SymbolicProxy::operator=(*csm);
  }
 }
 
 Symbolic::Symbolic(const CloningSymbolicInterface &s)
- : SymbolicProxy(Number<int>(0))
-{
- if(auto_expand)
-  SymbolicProxy::operator=(s.expand().simplify());
- else
-  SymbolicProxy::operator=(s.simplify());
-}
+{ *this = s; }
 
 Symbolic::Symbolic(const SymbolicProxy &s) : SymbolicProxy(s)
 {
@@ -351,7 +368,7 @@ Symbolic::Symbolic(const SymbolicProxy &s) : SymbolicProxy(s)
   // s is presumed const, so indexing via operator()
   // should access a copy
  {
-  CastPtr<SymbolicMatrix> csm(*s,1);
+  CastPtr<const SymbolicMatrix> csm(s);
   SymbolicProxy::operator=(*csm);
  }
 }
@@ -388,7 +405,7 @@ Symbolic::Symbolic(const char *s,int n,int m)
 Symbolic::Symbolic(const Symbolic &s,int n,int m)
  : SymbolicProxy(SymbolicMatrix(s,n,m)) {}
 
-Symbolic::Symbolic(const list<Symbolic> &l) : SymbolicProxy(Number<int>(0))
+Symbolic::Symbolic(const list<Symbolic> &l)
 {
  list<list<Symbolic> > ll;
  ll.push_back(l);
@@ -402,9 +419,12 @@ Symbolic::~Symbolic() {}
 
 SymbolicProxy &Symbolic::operator=(const CloningSymbolicInterface &s)
 {
+// cout << "*** " << &s << " " ; /*s.print(cout);*/ cout << endl;
+#if 1
  if(auto_expand)
   SymbolicProxy::operator=(s.expand().simplify());
  else
+#endif
   SymbolicProxy::operator=(s.simplify());
  return *this;
 }
@@ -433,7 +453,7 @@ SymbolicProxy &Symbolic::operator=(const list<list<Symbolic> > &l)
 Symbolic Symbolic::operator[](const Equation &p) const
 { return subst(p); }
 
-Symbolic Symbolic::operator[](const list<Equation> &l) const
+Symbolic Symbolic::operator[](const Equations &l) const
 { return subst(l); }
 
 Symbolic Symbolic::operator[](const Symbolic &p) const
@@ -443,7 +463,7 @@ Symbolic Symbolic::operator[](const Symbolic &p) const
  if(type() == typeid(SymbolicMatrix))
  {
   // make a copy of *this
-  CastPtr<SymbolicMatrix> m(*this,1);
+  CastPtr<SymbolicMatrix> m(**this);
   int i, j;
   for(i=m->rows()-1;i>=0;i--)
    for(j=m->cols()-1;j>=0;j--)
@@ -456,7 +476,7 @@ Symbolic Symbolic::operator[](const Symbolic &p) const
 Symbolic Symbolic::operator[](const list<Symbolic> &l) const
 {
  Symbolic result(*this);
- for(list<Symbolic>::const_iterator i=l.begin();i!=l.end();i++)
+ for(list<Symbolic>::const_iterator i=l.begin();i!=l.end();++i)
   result = result[*i];
  return result;
 }
@@ -551,12 +571,28 @@ Symbolic Symbolic::subst(const Symbolic &x,const double &d,int &n) const
 { return subst(x,Number<double>(d),n); }
 
 Symbolic Symbolic::subst(const Equation &e,int &n) const
-{ return subst(e.lhs,e.rhs,n); }
+{
+ int nsubs = 0;
+ Symbolic lhs, rhs, r;
+ list<Equations>::iterator i;
+ // use the existing substitution for equations without binding variables
+ if(e.free.empty()) return subst(e.lhs,e.rhs,n);
 
-Symbolic Symbolic::subst(const list<Equation> &l,int &n) const
+ PatternMatches eq = this->match_parts(e.lhs, e.free);
+ for(i=eq.begin(),r=*this;i!=eq.end();++i)
+ {
+  lhs = e.lhs.subst(*i, nsubs);
+  rhs = e.rhs.subst(*i, nsubs);
+  // don't perform identity substitutions => subst_all loops infinitely
+  if(lhs != rhs) r = r.subst(lhs,rhs,n);
+ }
+ return r;
+}
+
+Symbolic Symbolic::subst(const Equations &l,int &n) const
 {
  Symbolic result(*this);
- for(list<Equation>::const_iterator i=l.begin();i!=l.end();i++)
+ for(Equations::const_iterator i=l.begin();i!=l.end();++i)
   result = result.subst(*i,n);
  return result;
 }
@@ -575,16 +611,25 @@ Symbolic Symbolic::subst_all(const Symbolic &x,
 }
 
 Symbolic Symbolic::subst_all(const Equation &e,int &n) const
-{ return subst_all(e.lhs,e.rhs,n); }
+{
+ int n1 = n;
+ Symbolic r = subst(e,n);
+ while(n != n1)
+ {
+  n1 = n;
+  r = r.subst(e,n);
+ }
+ return r;
+}
 
-Symbolic Symbolic::subst_all(const list<Equation> &l,int &n) const
+Symbolic Symbolic::subst_all(const Equations &l,int &n) const
 {
  int n1;
  Symbolic result(*this);
  do
  {
   n1 = n;
-  for(list<Equation>::const_iterator i=l.begin();i!=l.end();i++)
+  for(Equations::const_iterator i=l.begin();i!=l.end();++i)
    result = result.subst(*i,n);
  } while(n != n1);
 
@@ -613,7 +658,7 @@ Symbolic Symbolic::commutative(int c) const
  if(type() == typeid(SymbolicMatrix))
  {
   // make a copy *this
-  CastPtr<SymbolicMatrix> m(*this,1);
+  CastPtr<SymbolicMatrix> m(**this);
   int i, j;
   for(i=m->rows()-1;i>=0;i--)
    for(j=m->cols()-1;j>=0;j--)
@@ -630,7 +675,7 @@ Symbolic Symbolic::operator~() const
  if(type() == typeid(SymbolicMatrix))
  {
   // make a copy of *this
-  CastPtr<SymbolicMatrix> m(*this,1);
+  CastPtr<SymbolicMatrix> m(**this);
   int i, j;
   for(i=m->rows()-1;i>=0;i--)
    for(j=m->cols()-1;j>=0;j--)
@@ -704,9 +749,9 @@ Symbolic Symbolic::operator%(const Symbolic &s) const
  CastPtr<const SymbolicMatrix> m2(s);
 
  if(m1->rows() == 1)
-  return SymbolicMatrix((*m1)(0) % (*m2)(0));
- else
   return SymbolicMatrix((*m1)[0] % (*m2)[0]);
+ else
+  return SymbolicMatrix((*m1)(0) % (*m2)(0));
 }
 
 int Symbolic::rows() const
@@ -749,7 +794,7 @@ Symbolic Symbolic::column(int i) const
 Symbolic Symbolic::identity() const
 {
  if(type() != typeid(SymbolicMatrix)) return Symbolic(1);
- return SymbolicMatrix(CastPtr<SymbolicMatrix>(*this,1)->identity());
+ return SymbolicMatrix(CastPtr<SymbolicMatrix>(**this)->identity());
 }
 
 Symbolic Symbolic::transpose() const
@@ -829,4 +874,7 @@ Symbolic Symbolic::inverse() const
 
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

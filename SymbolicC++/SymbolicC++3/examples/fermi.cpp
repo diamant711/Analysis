@@ -31,8 +31,8 @@ enum { create, annihilate };
 enum { up, down };
 enum { x, y, z };
 
-Symbolic vacuum("|0>");
-Symbolic vacuum_dual("<0|");
+Symbolic vacuum = ~Symbolic("|0>");
+Symbolic vacuum_dual = ~Symbolic("<0|");
 // ~ => non-commutative
 Symbolic c[2] = { ~Symbolic("cd", n, 2),
                   ~Symbolic("c",  n, 2) };
@@ -48,7 +48,8 @@ Equations fermi_relations(void)
  
  // <0|0> = 1 and 1/i = -i
  relations = (relations, vacuum_dual * vacuum == 1,
-              1/SymbolicConstant::i == -SymbolicConstant::i);
+              1/SymbolicConstant::i == -SymbolicConstant::i,
+              ((2*SymbolicConstant::i)^(-1)) == -SymbolicConstant::i/2);
 
  // c |0>  = 0
  // <0| cd = 0
@@ -151,7 +152,9 @@ int main(void)
   Symbolic righteq = (1-alpha)/4+R(i,z)
                    + (alpha-1)*(S.row(i) | S.row(i)) / 3
                    + (alpha+1)*(R.row(i) | R.row(i)) / 3;
-  if(lefteq.subst_all(relations) == righteq.subst_all(relations))
+  lefteq = lefteq.subst_all(relations);
+  righteq = righteq.subst_all(relations);
+  if(lefteq == righteq)
    cout << "Identity (7) holds for i = " << i << endl;
   else
    cout << "Identity (7) does not hold for i = " << i << endl

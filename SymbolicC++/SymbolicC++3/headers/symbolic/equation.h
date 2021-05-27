@@ -23,6 +23,8 @@
 
 #ifndef SYMBOLIC_CPLUSPLUS_EQUATION
 
+#include <list>
+
 using namespace std;
 
 #ifdef  SYMBOLIC_FORWARD
@@ -41,7 +43,9 @@ class Equation;
 class Equation: public CloningSymbolicInterface
 {
  public: Symbolic lhs, rhs;
+	 list<Symbolic> free;
          Equation(const Equation&);
+         Equation(const Equation&, const Symbolic &);
          Equation(const Symbolic&,const Symbolic&);
          ~Equation();
 
@@ -54,6 +58,9 @@ class Equation: public CloningSymbolicInterface
          Symbolic coeff(const Symbolic&) const;
          Expanded expand() const;
          int commute(const Symbolic&) const;
+         PatternMatches match(const Symbolic&, const list<Symbolic>&) const;
+         PatternMatches match_parts(const Symbolic&,
+                                    const list<Symbolic>&) const;
 
          operator bool() const;
          operator int() const;
@@ -64,13 +71,19 @@ class Equation: public CloningSymbolicInterface
 #endif
 #endif
 
+#define LIBSYMBOLICCPLUSPLUS
+
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_EQUATION_DEFINE
 #define SYMBOLIC_CPLUSPLUS_EQUATION_DEFINE
 #define SYMBOLIC_CPLUSPLUS_EQUATION
 
 Equation::Equation(const Equation &s)
-: CloningSymbolicInterface(s), lhs(s.lhs), rhs(s.rhs) {}
+: CloningSymbolicInterface(s), lhs(s.lhs), rhs(s.rhs), free(s.free) {}
+
+Equation::Equation(const Equation &s, const Symbolic &newfree)
+: CloningSymbolicInterface(s), lhs(s.lhs), rhs(s.rhs), free(s.free)
+{ free.push_back(newfree); }
 
 Equation::Equation(const Symbolic &s1,const Symbolic &s2)
 : lhs(s1), rhs(s2) {}
@@ -99,7 +112,7 @@ Symbolic Equation::df(const Symbolic &s) const
 { return Equation(lhs.df(s),rhs.df(s)); }
 
 Symbolic Equation::integrate(const Symbolic &s) const
-{ return Equation(lhs.integrate(s),rhs.integrate(s)); }
+{ return Equation(::integrate(lhs,s),::integrate(rhs,s)); }
 
 Symbolic Equation::coeff(const Symbolic &s) const
 { return 0; }
@@ -110,6 +123,26 @@ Expanded Equation::expand() const
 int Equation::commute(const Symbolic &s) const
 { return 0; }
 
+PatternMatches
+Equation::match(const Symbolic &s, const list<Symbolic> &p) const
+{
+ PatternMatches l;
+
+ if(s.type() == type())
+ {
+  PatternMatches llhs = lhs.match(s, p);
+  PatternMatches lrhs = rhs.match(s, p);
+  pattern_match_OR(l, llhs);
+  pattern_match_AND(l, lrhs);
+ }
+
+ return l;
+}
+
+PatternMatches
+Equation::match_parts(const Symbolic &s, const list<Symbolic> &p) const
+{ return s.match(*this, p); }
+
 Equation::operator bool() const
 { return lhs.compare(rhs); }
 
@@ -118,4 +151,7 @@ Equation::operator int() const
 
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

@@ -31,13 +31,15 @@ int main(void)
    A[0][0] = 1; A[0][1] = 2;
    A[1][0] = 3; A[1][1] = 4;
    cout << A;
-   cout << "Determinant of the matrix is " << A.determinant() << endl << endl;
+   cout << "Determinant of the matrix is " << A.determinant() << endl; 
+   cout << endl;
 
    for(int i=3;i<5;i++)
    {
       A.resize(i,i,i);
       cout << A;
-      cout << "Determinant of the matrix is " << A.determinant() << endl << endl;
+      cout << "Determinant of the matrix is " << A.determinant() << endl; 
+      cout << endl;
    }
    return 0;
 }

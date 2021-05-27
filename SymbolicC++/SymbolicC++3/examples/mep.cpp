@@ -125,10 +125,16 @@ int main(void)
   vector<string>     expression(11);
 
   // operators used and corresponding arity
-  ops["+"] = add; ops["-"] = sub; ops["*"] = mul; ops["s"] = sine;
+  ops["+"] = add;
+  ops["-"] = sub;
+  ops["*"] = mul;
+  ops["s"] = sine;
 
   // values for evaluation
-  values["a"] = 3.0; values["b"] = 4.0; values["c"] = 5.0; values["d"] = 6.0;
+  values["a"] = 3.0;
+  values["b"] = 4.0;
+  values["c"] = 5.0;
+  values["d"] = 6.0;
 
   // (a*b) + (c*d) + a - b + sin(b)
   expression[0] = "a";

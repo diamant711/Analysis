@@ -29,6 +29,7 @@
 #include <math.h>
 #include "vector.h"
 #include "vecnorm.h"
+#include "matrix.h"
 #include "identity.h"
 using namespace std;
 

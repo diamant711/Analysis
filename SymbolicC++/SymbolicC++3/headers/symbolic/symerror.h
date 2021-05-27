@@ -52,7 +52,7 @@ class SymbolicError
                        UnsupportedNumeric
                       } error;
 
-         error errno;
+         error errornumber;
          SymbolicError(const error &e);
          string message() const;
 };
@@ -60,15 +60,17 @@ class SymbolicError
 #endif
 #endif
 
+#define LIBSYMBOLICCPLUSPLUS
+
 #ifdef  SYMBOLIC_DEFINE
 #ifndef SYMBOLIC_CPLUSPLUS_ERRORS_DEFINE
 #define SYMBOLIC_CPLUSPLUS_ERRORS_DEFINE
 
-SymbolicError::SymbolicError(const error &e) : errno(e) {}
+SymbolicError::SymbolicError(const error &e) : errornumber(e) {}
 
 string SymbolicError::message() const
 {
- switch(errno)
+ switch(errornumber)
  {
    case IncompatibleNumeric:
         return "Tried to use two incompatible number together";
@@ -95,4 +97,7 @@ string SymbolicError::message() const
 
 #endif
 #endif
+
+#undef LIBSYMBOLICCPLUSPLUS
+
 #endif

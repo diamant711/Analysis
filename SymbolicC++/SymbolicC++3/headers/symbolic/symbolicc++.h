@@ -30,16 +30,18 @@
 
 // phased include headers
 // according to class hierarchy
-#include "symbolic.h"  // SymbolicInterface, Symbolic ...
-#include "equation.h"  //   Equation : CloningSymbolicInterface
-#include "number.h"    //   Numeric  : CloningSymbolicInterface
-#include "product.h"   //   Product  : CloningSymbolicInterface
-#include "sum.h"       //   Sum      : CloningSymbolicInterface
-#include "symbol.h"    //   Symbol   : CloningSymbolicInterface
-#include "functions.h" //     Sin    : Symbol ...
-#include "symmatrix.h" //   SymbolicMatrix : CloningSymbolicInterface
-#include "symerror.h"  //   SymbolicError  : CloningSymbolicInterface
-#include "constants.h"
+#include "symbolic/symbolic.h"  // SymbolicInterface, Symbolic ...
+#include "symbolic/equation.h"  //   Equation : CloningSymbolicInterface
+#include "symbolic/number.h"    //   Numeric  : CloningSymbolicInterface
+#include "symbolic/product.h"   //   Product  : CloningSymbolicInterface
+#include "symbolic/sum.h"       //   Sum      : CloningSymbolicInterface
+#include "symbolic/symbol.h"    //   Symbol   : CloningSymbolicInterface
+#include "symbolic/functions.h" //     Sin    : Symbol ...
+#include "symbolic/symmatrix.h" //   SymbolicMatrix : CloningSymbolicInterface
+#include "symbolic/symerror.h"  //   SymbolicError  : CloningSymbolicInterface
+#include "symbolic/constants.h"
+#include "symbolic/integrate.h"
+#include "symbolic/solve.h"
 
 #ifndef SYMBOLIC_CPLUSPLUS
 #define SYMBOLIC_CPLUSPLUS
@@ -59,19 +61,148 @@
 
 // forward declarations of all classes first
 #define SYMBOLIC_FORWARD
-#include "symbolicc++.h"
+#include "symbolic/symbolicc++.h"
 #undef  SYMBOLIC_FORWARD
+
+typedef list<Equation> Equations;
+typedef list<Equations> PatternMatches;
 
 // declarations of classes without definitions
 #define SYMBOLIC_DECLARE
-#include "symbolicc++.h"
+#include "symbolic/symbolicc++.h"
 #undef  SYMBOLIC_DECLARE
+
+// declarations for non-member functions
+// also used in definition phase for clarity
+
+Symbolic expand(const SymbolicInterface&);
+ostream &operator<<(ostream &,const Symbolic &);
+ostream &operator<<(ostream &,const Equation &);
+Symbolic operator+(const Symbolic &);
+Symbolic operator+(const Symbolic &,const Symbolic &);
+Symbolic operator+(const int &,const Symbolic &);
+Symbolic operator+(const Symbolic &,const int &);
+Symbolic operator+(const double &,const Symbolic &);
+Symbolic operator+(const Symbolic &,const double &);
+Symbolic operator++(Symbolic &);
+Symbolic operator++(Symbolic &,int);
+Symbolic operator-(const Symbolic &);
+Symbolic operator-(const Symbolic &,const Symbolic &);
+Symbolic operator-(const int &,const Symbolic &);
+Symbolic operator-(const Symbolic &,const int &);
+Symbolic operator-(const double &,const Symbolic &);
+Symbolic operator-(const Symbolic &,const double &);
+Symbolic operator--(Symbolic &);
+Symbolic operator--(Symbolic &,int);
+Symbolic operator*(const Symbolic &,const Symbolic &);
+Symbolic operator*(const int &,const Symbolic &);
+Symbolic operator*(const Symbolic &,const int &);
+Symbolic operator*(const double &,const Symbolic &);
+Symbolic operator*(const Symbolic &,const double &);
+Symbolic operator/(const Symbolic &,const Symbolic &);
+Symbolic operator/(const int &,const Symbolic &);
+Symbolic operator/(const Symbolic &,const int &);
+Symbolic operator/(const double &,const Symbolic &);
+Symbolic operator/(const Symbolic &,const double &);
+Symbolic operator+=(Symbolic &,const Symbolic &);
+Symbolic operator+=(Symbolic &,const int &);
+Symbolic operator+=(Symbolic &,const double &);
+Symbolic operator-=(Symbolic &,const Symbolic &);
+Symbolic operator-=(Symbolic &,const int &);
+Symbolic operator-=(Symbolic &,const double &);
+Symbolic operator*=(Symbolic &,const Symbolic &);
+Symbolic operator*=(Symbolic &,const int &);
+Symbolic operator*=(Symbolic &,const double &);
+Symbolic operator/=(Symbolic &,const Symbolic &);
+Symbolic operator/=(Symbolic &,const int &);
+Symbolic operator/=(Symbolic &,const double &);
+Equation operator==(const Symbolic &,const Symbolic &);
+Equation operator==(const Symbolic &,int);
+Equation operator==(int,const Symbolic &);
+Equation operator==(const Symbolic &,double);
+Equation operator==(double,const Symbolic &);
+int operator!=(const Symbolic &,const Symbolic &);
+int operator!=(const Symbolic &,int);
+int operator!=(int,const Symbolic &);
+int operator!=(const Symbolic &,double);
+int operator!=(double,const Symbolic &);
+Symbolic sin(const Symbolic &);
+Symbolic cos(const Symbolic &);
+Symbolic tan(const Symbolic &);
+Symbolic cot(const Symbolic &);
+Symbolic sec(const Symbolic &);
+Symbolic csc(const Symbolic &);
+Symbolic sinh(const Symbolic &);
+Symbolic cosh(const Symbolic &);
+Symbolic ln(const Symbolic &);
+Symbolic log(const Symbolic &,const Symbolic &);
+Symbolic pow(const Symbolic &,const Symbolic &);
+Symbolic operator^(const Symbolic &,const Symbolic &);
+Symbolic operator^(const Symbolic &,int);
+Symbolic operator^(int,const Symbolic &);
+Symbolic operator^(const Symbolic &,double);
+Symbolic operator^(double,const Symbolic &);
+Symbolic exp(const Symbolic &);
+Symbolic sqrt(const Symbolic &);
+Symbolic factorial(const Symbolic &);
+Symbolic gamma(const Symbolic &);
+Symbolic df(const Symbolic &,const Symbolic &);
+Symbolic df(const Symbolic &,const Symbolic &,unsigned int);
+Symbolic &rhs(Equations &,const Symbolic &);
+Symbolic &lhs(Equations &,const Symbolic &);
+template<> Symbolic zero(Symbolic);
+template<> Symbolic one(Symbolic);
+Equations operator,(const Equation &,const Equation &);
+Equations operator,(const Equations &,const Equation &);
+Equations operator,(const Equation &,const Equations &);
+list<Symbolic> operator,(const Symbolic &,const Symbolic &);
+list<Symbolic> operator,(const int &,const Symbolic &);
+list<Symbolic> operator,(const double &,const Symbolic &);
+list<Symbolic> operator,(const Symbolic &,const int &);
+list<Symbolic> operator,(const Symbolic &,const double &);
+list<Symbolic> operator,(const list<Symbolic> &,const Symbolic &);
+list<Symbolic> operator,(const list<Symbolic> &,const int &);
+list<Symbolic> operator,(const list<Symbolic> &,const double &);
+list<Symbolic> operator,(const Symbolic &,const list<Symbolic> &);
+list<Symbolic> operator,(const int &,const list<Symbolic> &);
+list<Symbolic> operator,(const double &,const list<Symbolic> &);
+list<list<Symbolic> >
+operator,(const list<Symbolic> &,const list<Symbolic> &);
+list<list<Symbolic> >
+operator,(const list<list<Symbolic> > &,const list<Symbolic> &);
+list<list<Symbolic> >
+operator,(const list<Symbolic> &,const list<list<Symbolic> > &);
+Equation operator,(const Symbolic &, const Equation &);
+Equation operator,(const list<Symbolic> &, const Equation &);
+ostream &operator<<(ostream &,const Equations &);
+ostream &operator<<(ostream &,const list<Symbolic> &);
+Symbolic tr(const Symbolic &);
+Symbolic trace(const Symbolic &);
+Symbolic det(const Symbolic &);
+Symbolic determinant(const Symbolic &);
+Symbolic kron(const Symbolic &,const Symbolic &);
+Symbolic dsum(const Symbolic &,const Symbolic &);
+Symbolic hadamard(const Symbolic &,const Symbolic &);
+void pattern_match_TRUE(PatternMatches &);
+void pattern_match_FALSE(PatternMatches &);
+int pattern_match_AND(Equations&, const Equation&);
+int pattern_match_AND(Equations&, const Equations&);
+void pattern_match_AND(PatternMatches &, const Equation&);
+void pattern_match_AND(PatternMatches &, const Equations&);
+void pattern_match_AND(PatternMatches &, const PatternMatches &);
+void pattern_match_OR(PatternMatches &, const Equation&);
+void pattern_match_OR(PatternMatches &, const Equations&);
+void pattern_match_OR(PatternMatches &, const PatternMatches &);
+
+// definitions for classes, member functions
+#define SYMBOLIC_DEFINE
+#include "symbolic/symbolicc++.h"
+#undef SYMBOLIC_DEFINE
+
+#define LIBSYMBOLICCPLUSPLUS
 
 // definitions for non-member functions
 // also used in definition phase for clarity
-
-typedef list<Equation> Equations;
-typedef list<Symbolic> SymbolicList;
 
 Symbolic expand(const SymbolicInterface &s)
 { return s.expand(); }
@@ -280,11 +411,14 @@ Symbolic exp(const Symbolic &s)
 Symbolic sqrt(const Symbolic &s)
 { return s ^ (Number<int>(1) / 2); }
 
+Symbolic factorial(const Symbolic &s)
+{ return Gamma(s + 1); }
+
+Symbolic gamma(const Symbolic &s)
+{ return Gamma(s); }
+
 Symbolic df(const Symbolic &s,const Symbolic &x)
 { return s.df(x); }
-
-Symbolic integrate(const Symbolic &s,const Symbolic &x)
-{ return s.integrate(x); }
 
 Symbolic df(const Symbolic &s,const Symbolic &x,unsigned int i)
 {
@@ -293,27 +427,20 @@ Symbolic df(const Symbolic &s,const Symbolic &x,unsigned int i)
  return r;
 }
 
-Symbolic integrate(const Symbolic &s,const Symbolic &x,unsigned int i)
+Symbolic &rhs(Equations &l,const Symbolic &lhs)
 {
- Symbolic r = s;
- while(i-- > 0) r = r.integrate(x);
- return r;
-}
-
-Symbolic &rhs(list<Equation> &l,const Symbolic &lhs)
-{
- list<Equation>::iterator i = l.begin();
- for(i=l.begin();i!=l.end();i++)
+ Equations::iterator i = l.begin();
+ for(i=l.begin();i!=l.end();++i)
   if(i->lhs == lhs) return i->rhs;
  cerr << "Equation list does not contain lhs " << lhs << endl;
  throw SymbolicError(SymbolicError::NoMatch);
  return i->rhs;
 }
 
-Symbolic &lhs(list<Equation> &l,const Symbolic &rhs)
+Symbolic &lhs(Equations &l,const Symbolic &rhs)
 {
- list<Equation>::iterator i = l.begin();
- for(i=l.begin();i!=l.end();i++)
+ Equations::iterator i = l.begin();
+ for(i=l.begin();i!=l.end();++i)
   if(i->rhs == rhs) return i->lhs;
  cerr << "Equation list does not contain rhs " << rhs << endl;
  throw SymbolicError(SymbolicError::NoMatch);
@@ -324,26 +451,26 @@ template<> Symbolic zero(Symbolic) { return Number<int>(0); }
 
 template<> Symbolic one(Symbolic) { return Number<int>(1); }
 
-list<Equation>
+Equations
 operator,(const Equation &x,const Equation &y)
 {
- list<Equation> l;
+ Equations l;
  l.push_back(x); l.push_back(y);
  return l;
 }
 
-list<Equation>
-operator,(const list<Equation> &x,const Equation &y)
+Equations
+operator,(const Equations &x,const Equation &y)
 {
- list<Equation> l(x);
+ Equations l(x);
  l.push_back(y);
  return l;
 }
 
-list<Equation>
-operator,(const Equation &x,const list<Equation> &y)
+Equations
+operator,(const Equation &x,const Equations &y)
 {
- list<Equation> l(y);
+ Equations l(y);
  l.push_front(x);
  return l;
 }
@@ -421,6 +548,39 @@ operator,(const list<Symbolic> &x,const list<list<Symbolic> > &y)
  return l;
 }
 
+Equation operator,(const Symbolic &x, const Equation &e)
+{
+ if(x.type() == typeid(UniqueSymbol) || x.type() != typeid(Symbol))
+ {
+  Equation p = e;
+  p.free.push_front(x);
+  return p;
+ }
+
+ UniqueSymbol u(*CastPtr<Symbol>(x));
+ Equation p = e;
+ p.free.push_front(u);
+ p.lhs = p.lhs[x == u];
+ p.rhs = p.rhs[x == u];
+ return p;
+}
+
+Equation operator,(const list<Symbolic> &x, const Equation &e)
+{
+ Equation p = e;
+ list<Symbolic>::const_reverse_iterator i;
+ for(i=x.rbegin(); i!=x.rend(); ++i)
+  if(i->type() != typeid(UniqueSymbol) && i->type() == typeid(Symbol))
+  {
+   UniqueSymbol u(*CastPtr<Symbol>(*i));
+   p.free.push_front(u);
+   p.lhs = p.lhs[*i == u];
+   p.rhs = p.rhs[*i == u];
+  }
+  else p.free.push_front(x);
+ return p;
+}
+
 ostream &operator<<(ostream &o,const Equations &e)
 {
  Equations::const_iterator i = e.begin();
@@ -434,9 +594,9 @@ ostream &operator<<(ostream &o,const Equations &e)
  return o;
 }
 
-ostream &operator<<(ostream &o,const SymbolicList &e)
+ostream &operator<<(ostream &o,const list<Symbolic> &e)
 {
- SymbolicList::const_iterator i = e.begin();
+ list<Symbolic>::const_iterator i = e.begin();
  o << "[ ";
  while(i != e.end())
  {
@@ -447,26 +607,128 @@ ostream &operator<<(ostream &o,const SymbolicList &e)
  return o;
 }
 
-Symbolic tr(const Symbolic &x) { return x.trace(); }
+Symbolic tr(const Symbolic &x) { return Trace(x); }
 
-Symbolic trace(const Symbolic &x) { return x.trace(); }
+Symbolic trace(const Symbolic &x) { return Trace(x); }
 
-Symbolic det(const Symbolic &x) { return x.determinant(); }
+Symbolic det(const Symbolic &x) { return Determinant(x); }
 
-Symbolic determinant(const Symbolic &x) { return x.determinant(); }
+Symbolic determinant(const Symbolic &x) { return Determinant(x); }
 
 Symbolic kron(const Symbolic &x,const Symbolic &y)
-{ return x.kron(y); }
+{ return Kronecker(x,y); }
 
 Symbolic dsum(const Symbolic &x,const Symbolic &y)
-{ return x.dsum(y); }
+{ return DirectSum(x,y); }
 
 Symbolic hadamard(const Symbolic &x,const Symbolic &y)
-{ return x.hadamard(y); }
+{ return Hadamard(x,y); }
 
-// definitions for classes, member functions
-#define SYMBOLIC_DEFINE
-#include "symbolicc++.h"
-#undef  SYMBOLIC_DEFINE
+void pattern_match_TRUE(PatternMatches &l)
+{
+ PatternMatches p;
+ // successful match, without bindings
+ p.push_back(Equations());
+ l = p;
+}
+
+void pattern_match_FALSE(PatternMatches &l)
+{ l = PatternMatches(); /* empty: no matches */ }
+
+int pattern_match_AND(Equations &l, const Equation &e)
+{
+ Equations::iterator i;
+ for(i=l.begin(); i!=l.end(); ++i)
+ {
+  if(i->lhs == e.lhs && i->rhs != e.rhs)
+   return 0; // conflicting binding
+  if(i->lhs == e.lhs && i->rhs == e.rhs)
+   return 1; // already added
+ }
+ l.push_back(e);
+ return 1;
+}
+
+int pattern_match_AND(Equations &l, const Equations &e)
+{
+ Equations::const_iterator j;
+ for(j=e.begin();j!=e.end();++j)
+  if(!pattern_match_AND(l,*j)) return 0;
+ return 1;
+}
+
+void pattern_match_AND(PatternMatches &l, const Equation &e)
+{
+ PatternMatches::iterator i;
+ 
+ for(i=l.begin();i!=l.end();)
+ {
+  Equations eq(*i);
+  if(pattern_match_AND(eq,e)) *(i++) = eq;
+  else i = l.erase(i);
+ }
+}
+
+void pattern_match_AND(PatternMatches &l, const Equations &e)
+{
+ PatternMatches::iterator i;
+
+ for(i=l.begin();i!=l.end();)
+ {
+  Equations eq(*i);
+  if(pattern_match_AND(eq,e)) *(i++) = eq;
+  else i = l.erase(i);
+ }
+}
+
+void pattern_match_AND(PatternMatches &l, const PatternMatches &e)
+{
+ PatternMatches::iterator i;
+ PatternMatches::const_iterator j;
+ PatternMatches newl;
+
+ for(i=l.begin();i!=l.end();++i)
+  for(j=e.begin();j!=e.end();++j)
+  {
+   Equations eq(*i);
+   if(pattern_match_AND(eq,*j)) newl.push_back(eq);
+  }
+
+ l = newl;
+}
+
+void pattern_match_OR(PatternMatches &l, const Equation &e)
+{
+ Equations eq;
+ eq.push_back(e);
+ pattern_match_OR(l, eq);
+}
+
+void pattern_match_OR(PatternMatches &l, const Equations &e)
+{
+ PatternMatches::iterator i;
+ Equations::const_iterator j, k;
+ for(i=l.begin(); i!=l.end(); ++i)
+ {
+  if(i->size() != e.size()) continue;
+  for(j=i->begin(); j!=i->end(); ++j)
+  {
+   for(k=e.begin(); k!=e.end(); ++k) if(j->compare(*k)) break;
+   if(k == e.end()) break;
+  }
+  if(j == i->end()) return;
+ }
+ if(i == l.end()) l.push_back(e);
+}
+
+void pattern_match_OR(PatternMatches &l, const PatternMatches &e)
+{
+ PatternMatches::const_iterator i;
+ for(i=e.begin(); i!=e.end(); ++i)
+  pattern_match_OR(l, *i);
+//l.insert(l.end(), e.begin(), e.end());
+}
+
+#undef LIBSYMBOLICCPLUSPLUS
 
 #endif
