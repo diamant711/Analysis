@@ -24,7 +24,7 @@ typedef struct {
 	double test_x2_r;
 } linear_fit_parameters;
 
-static const char* ConvertDoubleToString(double value);
+static void compatibility_notation(linear_fit_parameters *fit_data);
 
 int linear_fit_data_in_parser(linear_fit_parameters* fit_data, char* path);
 

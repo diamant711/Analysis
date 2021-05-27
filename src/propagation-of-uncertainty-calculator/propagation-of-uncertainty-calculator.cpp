@@ -1,5 +1,5 @@
 #include "propagation-of-uncertainty-calculator.h"
-#include <cstdlib>
+#include <fstream>
 
 static void save_propagation_data(propagation_data *data){
 	ofstream file_out;

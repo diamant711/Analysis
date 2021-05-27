@@ -1,5 +1,24 @@
 #include "linear-fit.h"
 
+static void compatibility_notation(linear_fit_parameters *fit_data){
+	char **file_ram;
+	int line = 0;
+	string tmp;
+	fstream file;
+	file.open(fit_data->input_file_path);
+	if(!file.good())
+		return;
+	file >> tmp;
+	while(!file.eof()){
+		line++;
+		file >> tmp;
+	}
+  file.clear();
+  file.seekg(0, ios::beg);	
+	for(;;){
+	}
+}
+
 int linear_fit_data_in_parser(linear_fit_parameters *fit_data, char *path){
 	int len;
 	fit_data->input_file_path = path;
@@ -69,11 +88,12 @@ int linear_fit_output(linear_fit_parameters *fit_data, char *x_title, char *y_ti
   gr_xy_err->SetMarkerColor(4);
   gr_xy_err->SetMarkerStyle(20);
 	char title[100];
-	sprintf(title, "m = %lf +- %lf // q = %lf +- %lf // ~x2 = %lf", fit_data->m, 
-																															fit_data->sigma_m, 
-																															fit_data->q, 
-																															fit_data->sigma_q, 
-																															fit_data->test_x2_r);
+	sprintf(title, "m = %lf +- %lf // q = %lf +- %lf // ~x2 = %lf // GDL = %d", fit_data->m, 
+																																							 fit_data->sigma_m, 
+																																							 fit_data->q, 
+																																							 fit_data->sigma_q, 
+																																							 fit_data->test_x2_r,
+																																							 fit_data->dots - 2);
 	gr_xy_err->SetTitle(title);
   gr_xy_err->GetXaxis()->SetTitle(x_title);
   gr_xy_err->GetYaxis()->SetTitle(y_title);
