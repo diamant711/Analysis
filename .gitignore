@@ -3,57 +3,177 @@ output/
 .analysis-history.log
 analysis
 test_data.csv
-	SymbolicC++/SymbolicC++3-3.35/.libs/
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc++.la
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-array.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-array.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-cloning.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-cloning.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-constants.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-constants.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-derive.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-derive.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-equation.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-equation.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-functions.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-functions.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-identity.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-identity.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-integrate.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-integrate.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matnorm.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matnorm.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matrix.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matrix.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-multinomial.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-multinomial.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-number.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-number.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-polynomial.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-polynomial.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-product.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-product.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-quatern.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-quatern.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-rational.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-rational.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-solve.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-solve.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-sum.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-sum.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbol.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbol.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolic.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolic.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolicc++.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolicc++.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symerror.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symerror.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symmatrix.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symmatrix.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vecnorm.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vecnorm.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vector.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vector.o
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-verylong.lo
-	SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-verylong.o
+SymbolicC++/SymbolicC++3-3.35/.libs/
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc++.la
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-array.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-array.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-cloning.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-cloning.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-constants.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-constants.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-derive.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-derive.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-equation.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-equation.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-functions.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-functions.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-identity.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-identity.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-integrate.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-integrate.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matnorm.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matnorm.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matrix.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-matrix.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-multinomial.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-multinomial.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-number.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-number.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-polynomial.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-polynomial.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-product.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-product.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-quatern.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-quatern.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-rational.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-rational.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-solve.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-solve.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-sum.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-sum.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbol.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbol.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolic.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolic.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolicc++.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symbolicc++.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symerror.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symerror.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symmatrix.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-symmatrix.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vecnorm.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vecnorm.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vector.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-vector.o
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-verylong.lo
+SymbolicC++/SymbolicC++3-3.35/libsymbolicc___la-verylong.o
+SymbolicC++/SymbolicC++3/examples/Rational.java
+SymbolicC++/SymbolicC++3/examples/aresize.cpp
+SymbolicC++/SymbolicC++3/examples/asslegendre.cpp
+SymbolicC++/SymbolicC++3/examples/asslegendre.h
+SymbolicC++/SymbolicC++3/examples/bose1.cpp
+SymbolicC++/SymbolicC++3/examples/cantor.cpp
+SymbolicC++/SymbolicC++3/examples/chebyshev.cpp
+SymbolicC++/SymbolicC++3/examples/coeff1.cpp
+SymbolicC++/SymbolicC++3/examples/coeff2.cpp
+SymbolicC++/SymbolicC++3/examples/coeff3.cpp
+SymbolicC++/SymbolicC++3/examples/comm.cpp
+SymbolicC++/SymbolicC++3/examples/commute.cpp
+SymbolicC++/SymbolicC++3/examples/contract.cpp
+SymbolicC++/SymbolicC++3/examples/cumu.cpp
+SymbolicC++/SymbolicC++3/examples/derivatv.cpp
+SymbolicC++/SymbolicC++3/examples/deter.cpp
+SymbolicC++/SymbolicC++3/examples/division.cpp
+SymbolicC++/SymbolicC++3/examples/fermi.cpp
+SymbolicC++/SymbolicC++3/examples/fermi1.cpp
+SymbolicC++/SymbolicC++3/examples/first1.cpp
+SymbolicC++/SymbolicC++3/examples/first2.cpp
+SymbolicC++/SymbolicC++3/examples/firstintegral.cpp
+SymbolicC++/SymbolicC++3/examples/gepbool.cpp
+SymbolicC++/SymbolicC++3/examples/gepchaos.cpp
+SymbolicC++/SymbolicC++3/examples/gepint.cpp
+SymbolicC++/SymbolicC++3/examples/gepint2.cpp
+SymbolicC++/SymbolicC++3/examples/ghost.cpp
+SymbolicC++/SymbolicC++3/examples/goedel.h
+SymbolicC++/SymbolicC++3/examples/grass.cpp
+SymbolicC++/SymbolicC++3/examples/hamiltoneq.cpp
+SymbolicC++/SymbolicC++3/examples/hamiltonin.cpp
+SymbolicC++/SymbolicC++3/examples/hamiltonvar.cpp
+SymbolicC++/SymbolicC++3/examples/hermite.cpp
+SymbolicC++/SymbolicC++3/examples/hilbert.cpp
+SymbolicC++/SymbolicC++3/examples/hopf.cpp
+SymbolicC++/SymbolicC++3/examples/hyperliapunov.cpp
+SymbolicC++/SymbolicC++3/examples/inverse.cpp
+SymbolicC++/SymbolicC++3/examples/isprime.cpp
+SymbolicC++/SymbolicC++3/examples/jacobi.cpp
+SymbolicC++/SymbolicC++3/examples/kill.cpp
+SymbolicC++/SymbolicC++3/examples/kronecker.cpp
+SymbolicC++/SymbolicC++3/examples/laguerre.cpp
+SymbolicC++/SymbolicC++3/examples/lax.cpp
+SymbolicC++/SymbolicC++3/examples/legendre.cpp
+SymbolicC++/SymbolicC++3/examples/legendre.h
+SymbolicC++/SymbolicC++3/examples/lie.cpp
+SymbolicC++/SymbolicC++3/examples/ljapunov.cpp
+SymbolicC++/SymbolicC++3/examples/logistic.cpp
+SymbolicC++/SymbolicC++3/examples/lorenzfix.cpp
+SymbolicC++/SymbolicC++3/examples/lorenzliapunov.cpp
+SymbolicC++/SymbolicC++3/examples/mandel.cpp
+SymbolicC++/SymbolicC++3/examples/mep.cpp
+SymbolicC++/SymbolicC++3/examples/mersenne.cpp
+SymbolicC++/SymbolicC++3/examples/mycomplex.cpp
+SymbolicC++/SymbolicC++3/examples/nambu.cpp
+SymbolicC++/SymbolicC++3/examples/pade.cpp
+SymbolicC++/SymbolicC++3/examples/pexample2.cpp
+SymbolicC++/SymbolicC++3/examples/pexample3.cpp
+SymbolicC++/SymbolicC++3/examples/picard.cpp
+SymbolicC++/SymbolicC++3/examples/prime.h
+SymbolicC++/SymbolicC++3/examples/put.cpp
+SymbolicC++/SymbolicC++3/examples/ruelle.cpp
+SymbolicC++/SymbolicC++3/examples/sderive1.cpp
+SymbolicC++/SymbolicC++3/examples/sderive2.cpp
+SymbolicC++/SymbolicC++3/examples/setvalue.cpp
+SymbolicC++/SymbolicC++3/examples/sgoedel1.cpp
+SymbolicC++/SymbolicC++3/examples/sgoedel2.cpp
+SymbolicC++/SymbolicC++3/examples/spheric.cpp
+SymbolicC++/SymbolicC++3/examples/spicard.cpp
+SymbolicC++/SymbolicC++3/examples/sprime.cpp
+SymbolicC++/SymbolicC++3/examples/squater.cpp
+SymbolicC++/SymbolicC++3/examples/taylor1.cpp
+SymbolicC++/SymbolicC++3/examples/taylor2.cpp
+SymbolicC++/SymbolicC++3/examples/tensor.cpp
+SymbolicC++/SymbolicC++3/examples/trace.cpp
+SymbolicC++/SymbolicC++3/examples/var.cpp
+SymbolicC++/SymbolicC++3/examples/vdpliapunov.cpp
+SymbolicC++/SymbolicC++3/examples/vnorm.cpp
+SymbolicC++/SymbolicC++3/examples/vproduct.cpp
+SymbolicC++/SymbolicC++3/headers/array.h
+SymbolicC++/SymbolicC++3/headers/derive.h
+SymbolicC++/SymbolicC++3/headers/identity.h
+SymbolicC++/SymbolicC++3/headers/matnorm.h
+SymbolicC++/SymbolicC++3/headers/matrix.h
+SymbolicC++/SymbolicC++3/headers/multinomial.h
+SymbolicC++/SymbolicC++3/headers/polynomial.h
+SymbolicC++/SymbolicC++3/headers/quatern.h
+SymbolicC++/SymbolicC++3/headers/rational.h
+SymbolicC++/SymbolicC++3/headers/symbolic/cloning.h
+SymbolicC++/SymbolicC++3/headers/symbolic/constants.h
+SymbolicC++/SymbolicC++3/headers/symbolic/equation.h
+SymbolicC++/SymbolicC++3/headers/symbolic/functions.h
+SymbolicC++/SymbolicC++3/headers/symbolic/number.h
+SymbolicC++/SymbolicC++3/headers/symbolic/product.h
+SymbolicC++/SymbolicC++3/headers/symbolic/sum.h
+SymbolicC++/SymbolicC++3/headers/symbolic/symbol.h
+SymbolicC++/SymbolicC++3/headers/symbolic/symbolic.h
+SymbolicC++/SymbolicC++3/headers/symbolic/symbolicc++.h
+SymbolicC++/SymbolicC++3/headers/symbolic/symerror.h
+SymbolicC++/SymbolicC++3/headers/symbolic/symmatrix.h
+SymbolicC++/SymbolicC++3/headers/vecnorm.h
+SymbolicC++/SymbolicC++3/headers/vector.h
+SymbolicC++/SymbolicC++3/headers/verylong.h
+SymbolicC++/SymbolicC++3/lisp/differ.lisp
+SymbolicC++/SymbolicC++3/lisp/lisp.h
+SymbolicC++/SymbolicC++3/lisp/lisprun.cpp
+SymbolicC++/SymbolicC++3/lisp/poly.lisp
+SymbolicC++/SymbolicC++3/lisp/poly_eg.lisp
+SymbolicC++/SymbolicC++3/lisp/simp1.lisp
+SymbolicC++/SymbolicC++3/lisp/simp2.lisp
+SymbolicC++/SymbolicC++3/lisp/simp2_eg.lisp
+SymbolicC++/SymbolicC++3/lisp/simp3.lisp
+SymbolicC++/SymbolicC++3/lisp/simp3_eg.lisp
+SymbolicC++/SymbolicC++3-3.35.zip
+SymbolicC++/SymbolicC++3/ChangeLog
+SymbolicC++/SymbolicC++3/headers/cloning.h
+SymbolicC++/SymbolicC++3/headers/symbolic/integrate.h
+SymbolicC++/SymbolicC++3/headers/symbolic/product.h.orig
+SymbolicC++/SymbolicC++3/headers/symbolic/solve.h
+SymbolicC++/SymbolicC++3/headers/symbolicc++.h
