@@ -3,7 +3,6 @@
 #include <cstring>
 #include <cmath>
 #include <fstream>
-#include "symbolicc++.h"
 
 #define FILE_LOG ".analysis-history.log"
 

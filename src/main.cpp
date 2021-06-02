@@ -1,9 +1,12 @@
 #include <iostream>
 #include "linear-fit/linear-fit.h"
 #include "propagation-of-uncertainty-calculator/propagation-of-uncertainty-calculator.h"
+#include "best/best.h"
 
 #define LINEAR_FIT_SEL 'f'
 #define P_O_U 'p'
+#define BEST 'b'
+#define HELP 'h'
 
 using namespace std;
 
@@ -43,6 +46,21 @@ int main(int argc, char *argv[]){
 				delete prop_data; 
 			break;
 	  }
+		case BEST: {
+				best_data *data = new best_data; 
+				best_in_results_parser(data);
+				avarage_calculus(data);
+				output_compatibility_graph_best_approximation(data);
+				for(int i = 0; i < data->num_data_in; i++)
+					delete[] data->in_results[i];
+				delete[] data->in_results;
+				delete data;
+			break;
+		}
+		case HELP: {
+				help();
+			break;
+		}	
 		default: {
 				help();
 				return -1;
@@ -61,6 +79,7 @@ void help(){
 			 << "OPTION" << endl
 			 << "  -f\t\tfor linear fit of a list of point" << endl
 			 << "  -p\t\tfor propagation of uncertainty through a mathematical relation" << endl
+			 << "  -b\t\tfor compatibility check & best approximation" << endl
 			 << endl
 			 << "only one argument at a time is allowed if multiple arguments are insert the program" << endl
 			 << "only take the first." << endl
@@ -68,5 +87,8 @@ void help(){
 			 << "OPTION-RELEATED ARGUMENTS" << endl
 			 << "  -f\t\t[path to a file contenent data in plain text] the format of the file must is" << endl
 			 << "    \t\tthis:    x\ty\tsigma_x\t\tsigma_y" << endl 
-			 << "  -p #da fare#" << endl;
+			 << endl
+			 << "NOTE: the -p & -b option trigger an interactive Q/A in order to parse input from user," << endl
+			 << "so there aren't option-releated arguments for these"
+			 << endl;
 }

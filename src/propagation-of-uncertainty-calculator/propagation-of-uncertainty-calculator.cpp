@@ -40,7 +40,7 @@ static bool restore_propagation_data(propagation_data *data){
 		cout << "[" << i << "] ~ " << data->parameters_name[i] << " = " 
 				 << data->parameters[i][0] << " +- " << data->parameters[i][1] << endl;
 	while(1){	
-		cout << "Usa questi dati? [s/m/n] ";
+		cout << "Use this data? [y/m/n] ";
 		cin >> sel;
 		switch (sel) {
 			case 's':
@@ -49,10 +49,10 @@ static bool restore_propagation_data(propagation_data *data){
 		
 			case 'm':
 				int sel2;
-				cout << "Cosa vuoi modificare? Relazione (-1), parametri (0:" << data->num_par - 1 << "): ";
+				cout << "What do you want to modify? formula (-1), parameters (0:" << data->num_par - 1 << "): ";
 				cin >> sel2;
 				if(sel2 <= -1) {
-					cout << "Nuova relazione = ";
+					cout << "New formula = ";
 					cin >> data->formula;
 					save_propagation_data(data);
 					return 1;
@@ -80,7 +80,7 @@ static bool restore_propagation_data(propagation_data *data){
 			break;
 
 			default:
-				cout << "Selezione errata, riprova" << endl;
+				cout << "Error on input, retry" << endl;
 			break;
 		}
 	}
@@ -110,7 +110,7 @@ static char* replace_param(propagation_data *data, int par, char *mod_formula){
 
 void propagation_data_in_parser(propagation_data *data){
 	if(!restore_propagation_data(data)){
-		cout << "Inserire la relazione: ";
+		cout << "Insert a relation: ";
 		data->formula = new char[100];
 		cin >> data->formula;
 		for(int i = 0; data->formula[i] != '\0'; i++){
@@ -123,7 +123,7 @@ void propagation_data_in_parser(propagation_data *data){
 		data->parameters = new double*[data->num_par];
 		data->parameters_name = new char*[data->num_par];
 		for(int i = 0; i < data->num_par; i++){
-			cout << "Nome parametro [" << i << "] : ";
+			cout << "Parameter name [" << i << "] : ";
 			data->parameters_name[i] = new char[6];
 			cin >> data->parameters_name[i];
 			cout << data->parameters_name[i] << " = ";
