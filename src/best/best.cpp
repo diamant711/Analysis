@@ -7,7 +7,7 @@ void best_in_results_parser(best_data *data){
 	data->in_results = new double*[data->num_data_in];
 	for(int i = 0; i < data->num_data_in; i++){
 		data->in_results[i] = new double[2];
-		cout << i << "° Result = ";
+		cout << i + 1 << "° Result = ";
 		cin >> data->in_results[i][0];
 		cout << "Uncertainty" << i << " = ";
 		cin >> data->in_results[i][1];
