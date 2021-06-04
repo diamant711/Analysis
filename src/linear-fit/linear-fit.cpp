@@ -93,6 +93,7 @@ int linear_fit_calculus(linear_fit_parameters* fit_data){
 	fit_data->m = (s_xy * s_w - s_x * s_y) / delta;
 	fit_data->sigma_q = sqrt(s_xx/delta);
 	fit_data->sigma_m = sqrt(s_w/delta);
+	fit_data->test_x2 = 0;
 	for(int i = 0; i < fit_data->dots; i++){
 		fit_data->test_x2 += pow( (fit_data->data_in[1][i] - (fit_data->data_in[0][i] * fit_data->m + fit_data->q)) / fit_data->s_tot[i], 2);
 	}
