@@ -9,7 +9,7 @@ void best_in_results_parser(best_data *data){
 		data->in_results[i] = new double[2];
 		cout << i + 1 << "° Result = ";
 		cin >> data->in_results[i][0];
-		cout << "Uncertainty" << i << " = ";
+		cout << i + 1 << "° Uncertainty" << " = ";
 		cin >> data->in_results[i][1];
 	}
 }
